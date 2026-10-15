@@ -30,6 +30,14 @@ export const Store = {
     b.set(doc(db, 'termini', id), { ...t, uid, created: serverTimestamp() });
     await b.commit(); // ako je sat zauzet ili osoba taj dan već ima termin, cijela operacija ne uspije
   },
+  // Vlasnik salona sam upisuje termin (npr. klijent je nazvao) – bez računa klijenta
+  async dodajRucno(t) {
+    const id = `${t.datum}_${t.vrijeme}`;
+    const b = writeBatch(db);
+    b.set(doc(db, 'slots', id), { datum: t.datum, vrijeme: t.vrijeme });
+    b.set(doc(db, 'termini', id), { ...t, rucno: true, created: serverTimestamp() });
+    await b.commit(); // ne uspije ako je sat već zauzet
+  },
   // Vlasnik salona: termini od..do (npr. jedan mjesec), da se ne učitava cijela povijest odjednom
   async razdoblje(od, doDatuma) {
     return lista(await getDocs(query(collection(db, 'termini'), where('datum', '>=', od), where('datum', '<=', doDatuma))));
@@ -80,11 +88,29 @@ export const cijena = usluga => +((String(usluga || '').match(/\((\d+)\s*€\)/)
 export const DANI = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
 const uMinute = s => +s.slice(0, 2) * 60 + +s.slice(3, 5);
 const uSat = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
-export const radiDan = datum => !!SALON.radnoVrijeme[DANI[new Date(datum + 'T00:00').getDay()]];
-// Svi početci termina u danu, npr. 09:00, 09:30 … (zadnji završava kad salon zatvara)
-export function satiZaDan(datum) {
+
+// Hrvatski blagdani (uključujući Uskrsni ponedjeljak i Tijelovo, koji se mijenjaju svake godine)
+function uskrs(g) { // gregorijanski Uskrs (Meeus/Jones/Butcher)
+  const a = g % 19, b = Math.floor(g / 100), c = g % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+    h = (19 * a + b - d - Math.floor((b - f + 1) / 3) + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+    l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+    mj = Math.floor((h + l - 7 * m + 114) / 31), dan = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(g, mj - 1, dan);
+}
+const uDatum = d => d.toLocaleDateString('sv-SE');
+export function blagdan(datum) {
+  const g = +datum.slice(0, 4), md = datum.slice(5);
+  if (['01-01', '01-06', '05-01', '05-30', '06-22', '08-05', '08-15', '11-01', '11-18', '12-25', '12-26'].includes(md)) return true;
+  const u = uskrs(g), plus = n => uDatum(new Date(u.getFullYear(), u.getMonth(), u.getDate() + n));
+  return [plus(0), plus(1), plus(60)].includes(datum); // Uskrs, Uskrsni ponedjeljak, Tijelovo
+}
+const zatvoreno = datum => (SALON.blagdani && blagdan(datum)) || (SALON.neradniDani || []).includes(datum);
+export const radiDan = datum => !zatvoreno(datum) && !!SALON.radnoVrijeme[DANI[new Date(datum + 'T00:00').getDay()]];
+// Svi početci termina u danu, npr. 09:00, 09:30 … (zadnji završava kad salon zatvara).
+// sviDani = true: vlasnik smije upisati termin i na blagdan / neradni datum (ako je to inače radni dan u tjednu)
+export function satiZaDan(datum, sviDani = false) {
   const r = SALON.radnoVrijeme[DANI[new Date(datum + 'T00:00').getDay()]];
-  if (!r) return [];
+  if (!r || (!sviDani && zatvoreno(datum))) return [];
   const sati = [];
   for (let m = uMinute(r[0]); m + SALON.trajanjeTermina <= uMinute(r[1]); m += SALON.trajanjeTermina) sati.push(uSat(m));
   return sati;

@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#0b0b0c">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
@@ -108,6 +109,7 @@
       <button class="postavka" type="button" data-go="registracija" data-out><svg class="ik"><use href="#i-lock"/></svg><span data-i18n="registracija">Registracija</span><svg class="ik chev"><use href="#i-next"/></svg></button>
       <button class="postavka" type="button" data-go="profil" data-in hidden><svg class="ik"><use href="#i-user"/></svg><span data-i18n="p_profil">Korisnički profil</span><svg class="ik chev"><use href="#i-next"/></svg></button>
       <button class="postavka" type="button" data-go="racun" data-in hidden><svg class="ik"><use href="#i-lock"/></svg><span data-i18n="p_racun">Moj račun</span><svg class="ik chev"><use href="#i-next"/></svg></button>
+      <button class="postavka" type="button" data-go="privatnost"><svg class="ik"><use href="#i-lock"/></svg><span data-i18n="p_privatnost">Pravila privatnosti</span><svg class="ik chev"><use href="#i-next"/></svg></button>
       <button class="postavka" type="button" data-go="oaplikaciji"><svg class="ik"><use href="#i-info"/></svg><span data-i18n="p_oapp">O aplikaciji</span><svg class="ik chev"><use href="#i-next"/></svg></button>
       <button class="postavka" type="button" id="bOdjava" data-in hidden><svg class="ik"><use href="#i-logout"/></svg><span data-i18n="p_odjava">Odjavi me</span><svg class="ik chev"><use href="#i-next"/></svg></button>
       <button class="postavka opasno" type="button" data-go="obrisi" data-in hidden><svg class="ik"><use href="#i-trash"/></svg><span data-i18n="p_obrisi">Obriši račun</span><svg class="ik chev"><use href="#i-next"/></svg></button>
@@ -153,6 +155,7 @@
         <label><span data-i18n="lbl_lozinka2">Ponovi lozinku</span>
           <span class="lozinka"><input type="password" id="rLozinka2" required minlength="6" autocomplete="new-password"><button type="button" class="oko" aria-label="Show / hide password"><svg class="ik o-vidi"><use href="#i-eye"/></svg><svg class="ik o-skrij"><use href="#i-eyeoff"/></svg></button></span>
         </label>
+        <label class="kvacica"><input type="checkbox" id="rPristanak" required><span><span data-i18n="pristanak">Prihvaćam</span> <a href="#privatnost" data-i18n="pravila_privatnosti_link">pravila privatnosti</a></span></label>
         <button class="btn" type="submit" data-i18n="napravi_racun">Napravi račun</button>
         <p class="greska" id="rGreska" role="alert"></p>
       </form>
@@ -227,6 +230,29 @@
     </div>
   </section>
 
+  <section class="view" id="v-privatnost" hidden>
+    <button class="nazad" type="button" id="privatnostNazad"><svg class="ik"><use href="#i-back"/></svg><span data-i18n="natrag">Natrag</span></button>
+    <div class="narudzba">
+      <h2 data-i18n="p_privatnost">Pravila privatnosti</h2>
+      <div class="privatnost">
+        <h3 data-i18n="pv_h1"></h3>
+        <p data-i18n="pv_t1"></p>
+        <h3 data-i18n="pv_h2"></h3>
+        <p data-i18n="pv_t2"></p>
+        <h3 data-i18n="pv_h3"></h3>
+        <p data-i18n="pv_t3"></p>
+        <h3 data-i18n="pv_h4"></h3>
+        <p data-i18n="pv_t4"></p>
+        <h3 data-i18n="pv_h5"></h3>
+        <p data-i18n="pv_t5"></p>
+        <h3 data-i18n="pv_h6"></h3>
+        <p data-i18n="pv_t6"></p>
+        <h3 data-i18n="pv_h7"></h3>
+        <p data-i18n="pv_t7"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-oaplikaciji" hidden>
     <button class="nazad" type="button" data-go="postavke"><svg class="ik"><use href="#i-back"/></svg><span data-i18n="natrag">Natrag</span></button>
     <div class="narudzba">
@@ -277,7 +303,7 @@
     // pogled -> koja kartica u donjoj traci svijetli
     const POGLEDI = { pocetna: 'pocetna', usluge: 'usluge', termini: 'termini', postavke: 'postavke',
       prijava: 'pocetna', registracija: 'pocetna', rezervacija: 'pocetna',
-      profil: 'postavke', racun: 'postavke', oaplikaciji: 'postavke', obrisi: 'postavke' };
+      profil: 'postavke', racun: 'postavke', oaplikaciji: 'postavke', obrisi: 'postavke', privatnost: 'postavke' };
     const ZASTICENI = ['rezervacija', 'profil', 'racun', 'obrisi'];
     const MAX_BUDUCIH = SALON.maxBuducih; // najviše budućih termina odjednom po osobi (0 = bez ograničenja)
     let korisnik = null, profil = null, spreman = false, tab = 'buduci';
@@ -342,6 +368,7 @@
       if (ime.length < 2) { poruci($('rGreska'), 'e_ime'); return; }
       if (!tel) { poruci($('rGreska'), 'm_tel'); return; }
       if ($('rLozinka').value !== $('rLozinka2').value) { poruci($('rGreska'), 'e_razlicite'); return; }
+      if (!$('rPristanak').checked) { poruci($('rGreska'), 'e_pristanak'); return; }
       try {
         await Auth.register($('rEmail').value.trim(), $('rLozinka').value, ime, tel);
         profil = { ime, tel };
@@ -356,6 +383,8 @@
       try { await Auth.reset(mail); poruci($('lGreska'), 'reset_ok', { x: mail }, true); }
       catch { poruci($('lGreska'), 'reset_err'); }
     });
+    // Pravila privatnosti otvaraju se iz postavki ili iz registracije – "Natrag" vraća tamo odakle se došlo
+    $('privatnostNazad').addEventListener('click', () => { if (history.length > 1) history.back(); else location.hash = '#postavke'; });
     $('bOdjava').addEventListener('click', async () => {
       if (!confirm(t('potvrdi_odjavu'))) return;
       await Auth.logout(); location.hash = '#pocetna';

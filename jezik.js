@@ -44,7 +44,16 @@ const R = {
     obrisi_info: 'Brisanjem se trajno brišu tvoj račun, osobni podaci i svi tvoji termini. Ovo se ne može poništiti.',
     lozinka_potvrda: 'Lozinka (za potvrdu)', obrisi_gumb: 'Trajno obriši račun', odustani: 'Odustani',
     potvrdi_brisanje: 'Sigurno želiš trajno obrisati račun i sve svoje termine?', racun_obrisan: 'Račun je obrisan.',
-    kriva_lozinka: 'Pogrešna lozinka.', brisanje_greska: 'Brisanje nije uspjelo, pokušaj ponovno.'
+    kriva_lozinka: 'Pogrešna lozinka.', brisanje_greska: 'Brisanje nije uspjelo, pokušaj ponovno.',
+    p_privatnost: 'Pravila privatnosti', pristanak: 'Prihvaćam', pravila_privatnosti_link: 'pravila privatnosti',
+    e_pristanak: 'Za registraciju trebaš prihvatiti pravila privatnosti.',
+    pv_h1: 'Tko obrađuje tvoje podatke', pv_t1: 'Voditelj obrade osobnih podataka je {naziv}, {adresa}, tel. {telefon}. Aplikacija služi isključivo za naručivanje termina u tom salonu.',
+    pv_h2: 'Koje podatke prikupljamo', pv_t2: 'Ime, broj mobitela i email adresu koje upišeš pri registraciji, te podatke o tvojim terminima: datum, vrijeme, uslugu, napomenu i evidenciju dolazaka, nedolazaka i neplaćenih termina.',
+    pv_h3: 'Zašto ih prikupljamo', pv_t3: 'Kako bi mogao/la rezervirati, pregledati i otkazati termin, a salon te mogao kontaktirati u vezi termina. Pravna osnova je izvršenje usluge koju si zatražio/la te legitimni interes salona da vodi evidenciju termina i nedolazaka.',
+    pv_h4: 'Gdje se podaci čuvaju i tko ih vidi', pv_t4: 'Podaci se čuvaju u usluzi Google Firebase. Tvoje termine i podatke vidiš samo ti i salon. Podaci se ne prodaju i ne dijele s drugima u marketinške svrhe.',
+    pv_h5: 'Koliko dugo', pv_t5: 'Dok imaš račun. Kad obrišeš račun (Postavke → Obriši račun), trajno se brišu račun, osobni podaci i svi termini. Ako postoji neplaćeni propušteni termin, račun se može obrisati tek kad se on podmiri.',
+    pv_h6: 'Tvoja prava', pv_t6: 'Imaš pravo na uvid u svoje podatke, ispravak (Postavke → Korisnički profil), brisanje i prigovor. Za sve upite javi se salonu. Ako smatraš da se tvoji podaci obrađuju nezakonito, možeš podnijeti pritužbu Agenciji za zaštitu osobnih podataka (azop.hr).',
+    pv_h7: 'Kolačići', pv_t7: 'Aplikacija ne koristi kolačiće za praćenje ni oglase. U pregledniku se pamte samo odabrani jezik i prijava u račun.'
   },
   en: {
     title_app: '{naziv}', tab_pocetna: 'Home', tab_usluge: 'Services', tab_termini: 'Appointments', tab_postavke: 'Settings',
@@ -87,7 +96,16 @@ const R = {
     obrisi_info: 'Deleting permanently removes your account, personal data and all your appointments. This cannot be undone.',
     lozinka_potvrda: 'Password (to confirm)', obrisi_gumb: 'Delete account permanently', odustani: 'Cancel',
     potvrdi_brisanje: 'Are you sure you want to permanently delete your account and all your appointments?', racun_obrisan: 'Account deleted.',
-    kriva_lozinka: 'Wrong password.', brisanje_greska: 'Deletion failed, please try again.'
+    kriva_lozinka: 'Wrong password.', brisanje_greska: 'Deletion failed, please try again.',
+    p_privatnost: 'Privacy policy', pristanak: 'I accept the', pravila_privatnosti_link: 'privacy policy',
+    e_pristanak: 'You need to accept the privacy policy to sign up.',
+    pv_h1: 'Who processes your data', pv_t1: 'The data controller is {naziv}, {adresa}, phone {telefon}. The app is used only for booking appointments at this salon.',
+    pv_h2: 'What data we collect', pv_t2: 'The name, mobile number and email address you enter when signing up, and data about your appointments: date, time, service, note and a record of attendance, missed and unpaid appointments.',
+    pv_h3: 'Why we collect it', pv_t3: "So you can book, view and cancel appointments, and so the salon can contact you about them. The legal basis is providing the service you requested and the salon's legitimate interest in keeping a record of appointments and no-shows.",
+    pv_h4: 'Where data is stored and who sees it', pv_t4: 'Data is stored in Google Firebase. Only you and the salon can see your appointments and details. Data is not sold or shared with others for marketing.',
+    pv_h5: 'How long', pv_t5: 'As long as you have an account. When you delete your account (Settings → Delete account), your account, personal data and all appointments are permanently deleted. If there is an unpaid missed appointment, the account can be deleted once it is settled.',
+    pv_h6: 'Your rights', pv_t6: 'You have the right to access, correct (Settings → User profile), delete and object to the processing of your data. Contact the salon for any request. If you believe your data is processed unlawfully, you can file a complaint with the Croatian Data Protection Agency (azop.hr).',
+    pv_h7: 'Cookies', pv_t7: 'The app does not use tracking or advertising cookies. The browser only remembers your chosen language and your login.'
   }
 };
 
@@ -96,7 +114,7 @@ try { lang = localStorage.getItem('jezik') || 'hr'; } catch {}
 if (!R[lang]) lang = 'hr';
 
 export const jezik = () => lang;
-const ZADANO = { naziv: SALON.naziv, h: SALON.rokOtkaza };
+const ZADANO = { naziv: SALON.naziv, h: SALON.rokOtkaza, adresa: SALON.adresa, telefon: SALON.telefon };
 export const t = (k, v = {}) =>
   (R[lang][k] ?? R.hr[k] ?? k).replace(/\{(\w+)\}/g, (_, n) => v[n] ?? ZADANO[n] ?? '');
 

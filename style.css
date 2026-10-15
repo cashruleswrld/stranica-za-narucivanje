@@ -258,6 +258,11 @@ footer {
 .termin a { color: var(--ink); }
 
 /* O aplikaciji: kontakt za izradu aplikacija */
+.kvacica { display: flex; align-items: flex-start; gap: 10px; font-weight: 400; color: var(--muted); }
+.kvacica input { width: 20px; height: 20px; margin-top: 3px; flex: none; accent-color: var(--naglasak); }
+.kvacica a { color: var(--ink); }
+.privatnost h3 { font-family: "Barlow Condensed", sans-serif; font-size: 1.2rem; letter-spacing: .02em; margin: 22px 0 6px; }
+.privatnost p { color: var(--muted); }
 .kontakt { display: grid; gap: 12px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
 .kontakt p { color: var(--muted); }
 .kontakt a { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 500; font-size: 1.1rem; text-decoration: none; justify-self: start; }

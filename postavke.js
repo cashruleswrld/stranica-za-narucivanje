@@ -4,7 +4,7 @@
 // ===================================================================
 
 export const SALON = {
-  naziv: 'Moj Salon',
+  naziv: 'Studio Lana',
   logo: '',                    // npr. 'logo.svg' (bijeli logo na prozirnoj pozadini); prazno = prikazuje se naziv
   telefon: '091 000 0000',
   adresa: 'Ilica 1, Zagreb',
@@ -24,13 +24,17 @@ export const SALON = {
     ned: null
   },
   trajanjeTermina: 30,         // minuta između dva termina
+  blagdani: true,              // true = na hrvatske blagdane se ne može naručiti
+  neradniDani: [],             // dodatni zatvoreni dani, npr. ['2026-12-24', '2026-12-31']
 
   // Usluge: naziv na hrvatskom i engleskom, cijena u eurima
   usluge: [
-    { hr: 'Šišanje', en: 'Haircut', cijena: 20 },
+    { hr: 'Žensko šišanje', en: "Women's haircut", cijena: 25 },
     { hr: 'Feniranje', en: 'Blow-dry', cijena: 15 },
-    { hr: 'Manikura', en: 'Manicure', cijena: 25 },
-    { hr: 'Gel nokti', en: 'Gel nails', cijena: 35 }
+    { hr: 'Bojanje kose', en: 'Hair colouring', cijena: 45 },
+    { hr: 'Manikura', en: 'Manicure', cijena: 20 },
+    { hr: 'Gel lak', en: 'Gel polish', cijena: 25 },
+    { hr: 'Pedikura', en: 'Pedicure', cijena: 30 }
   ],
 
   danaUnaprijed: 60,           // koliko dana unaprijed se može naručiti

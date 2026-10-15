@@ -8,6 +8,7 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="manifest" href="manifest-admin.json">
   <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -37,8 +38,38 @@
       <h1 style="margin-bottom:20px">Termini</h1>
       <div id="kalendar"></div>
       <div class="dan-naslov"><h2 id="danNaslov"></h2><span class="prazno" id="danBroj"></span></div>
+      <p class="upozorenje" id="danZatvoren" hidden></p>
+      <button class="btn-otkazi" type="button" id="dodajTermin" style="margin-bottom:14px">+ Upiši termin</button>
       <div id="lista"></div>
     </section>
+
+    <!-- Ručni upis termina (klijent je nazvao ili došao bez narudžbe) -->
+    <dialog id="rucno" class="prozor">
+      <div class="prozor-glava">
+        <div><h2>Upiši termin</h2><span class="prazno" id="rDan"></span></div>
+        <button class="kal-strelica" type="button" id="rZatvori" aria-label="Zatvori">×</button>
+      </div>
+      <form id="rForma">
+        <label>Ime klijenta
+          <input type="text" name="ime" required minlength="2" maxlength="50">
+        </label>
+        <label>Broj mobitela (neobavezno)
+          <input type="tel" name="tel">
+        </label>
+        <label>Usluga
+          <select name="usluga" required></select>
+        </label>
+        <div class="polje"><span>Vrijeme</span>
+          <div class="sati-izbor" id="rSati"></div>
+          <input type="hidden" name="vrijeme">
+        </div>
+        <label>Napomena (neobavezno)
+          <textarea name="napomena" rows="2" maxlength="500"></textarea>
+        </label>
+        <button class="btn" type="submit">Spremi termin</button>
+        <p class="greska" id="rGreska" role="alert"></p>
+      </form>
+    </dialog>
 
     <!-- Povijest jednog klijenta (otvara se klikom na termin) -->
     <dialog id="povijest" class="prozor">
@@ -52,7 +83,7 @@
   </main>
 
   <script type="module">
-    import { Store, Auth, cijena } from './app.js';
+    import { Store, Auth, cijena, provjeriTel, satiZaDan, radiDan, blagdan, vrijednostUsluge } from './app.js';
     import { SALON } from './postavke.js';
     import { kalendar, ymd } from './kalendar.js';
     const $ = id => document.getElementById(id);
@@ -119,6 +150,9 @@
       if (mjeseci[d.slice(0, 7)] === null) { lista.append(el('p', 'prazno', 'Nemaš dozvolu ili je došlo do greške.')); return; }
       const termini = dan(d).sort((a, b) => a.vrijeme.localeCompare(b.vrijeme));
       $('danBroj').textContent = termini.length ? `${termini.length} ${termini.length === 1 ? 'termin' : 'termina'}` : '';
+      $('danZatvoren').hidden = radiDan(d);
+      $('danZatvoren').textContent = blagdan(d) ? 'Blagdan – klijenti se taj dan ne mogu naručiti.' : 'Neradni dan – klijenti se taj dan ne mogu naručiti.';
+      $('dodajTermin').hidden = !satiZaDan(d, true).length;
       if (!termini.length) { lista.append(el('p', 'prazno', 'Nema termina za taj dan.')); return; }
       termini.forEach(t => lista.append(kartica(t, () => ucitajMjesec(d.slice(0, 7)))));
     }
@@ -148,7 +182,11 @@
       const info = el('div', 'info');
       info.append(el('strong', null, uPovijesti ? `${kratkiDan(t.datum)} u ${t.vrijeme}` : `${t.vrijeme} – ${t.ime}`), el('br'));
       if (uPovijesti) info.append(t.usluga);
-      else { const tel = el('a', null, t.tel); tel.href = 'tel:' + t.tel; info.append(`${t.usluga} · `, tel); }
+      else {
+        info.append(t.usluga);
+        if (t.tel) { const tel = el('a', null, t.tel); tel.href = 'tel:' + t.tel; info.append(' · ', tel); }
+        if (t.rucno) info.append(el('span', 'prazno', ' · upisao salon'));
+      }
       if (t.napomena) info.append(el('br'), 'Napomena: ' + t.napomena);
       if (t.nijeDosao) info.append(el('span', 'znacka-nije', `${t.otkazanKasno ? 'Kasno otkazano' : 'Nije došao/la'} · ${t.podmireno ? 'plaćeno' : 'nije plaćeno ' + cijena(t.usluga) + ' €'}`));
       else if (t.otkazanKasno) info.append(el('span', 'prazno', 'Kasno otkazano · oprošteno'));
@@ -208,6 +246,44 @@
         .forEach(x => $('pLista').append(kartica(x, () => { povijest(t, true); ucitajMjesec(kal.mjesec()); }, true)));
     }
     $('pZatvori').onclick = () => $('povijest').close();
+
+    // ----- Ručni upis termina za odabrani dan -----
+    const rForma = $('rForma');
+    SALON.usluge.forEach(u => rForma.usluga.append(new Option(`${u.hr} – ${u.cijena} €`, vrijednostUsluge(u))));
+    $('dodajTermin').onclick = () => {
+      const d = kal.odabrani();
+      rForma.reset(); rForma.vrijeme.value = ''; $('rGreska').textContent = '';
+      $('rDan').textContent = lijepDan(d);
+      const zauzeti = new Set(dan(d).filter(t => !t.otkazanKasno).map(t => t.vrijeme));
+      const slobodni = satiZaDan(d, true).filter(s => !zauzeti.has(s));
+      $('rSati').innerHTML = '';
+      if (!slobodni.length) $('rSati').append(el('p', 'prazno', 'Nema slobodnih termina.'));
+      slobodni.forEach(s => {
+        const b = el('button', 'sat', s); b.type = 'button';
+        b.onclick = () => { rForma.vrijeme.value = s; $('rSati').querySelectorAll('.sat').forEach(x => x.classList.toggle('odabran', x === b)); };
+        $('rSati').append(b);
+      });
+      $('rucno').showModal();
+    };
+    rForma.addEventListener('submit', async e => {
+      e.preventDefault();
+      const g = $('rGreska'); g.textContent = '';
+      const ime = rForma.ime.value.trim(), unos = rForma.tel.value.trim(), tel = unos ? provjeriTel(unos) : '';
+      if (ime.length < 2) { g.textContent = 'Upiši ime klijenta.'; return; }
+      if (tel === null) { g.textContent = 'Broj mobitela nije ispravan (npr. 091 234 5678) – ili ostavi prazno.'; return; }
+      if (!rForma.vrijeme.value) { g.textContent = 'Odaberi vrijeme.'; return; }
+      const gumb = rForma.querySelector('button[type=submit]'); gumb.disabled = true;
+      const d = kal.odabrani();
+      try {
+        await Store.dodajRucno({ ime, tel, usluga: rForma.usluga.value, datum: d, vrijeme: rForma.vrijeme.value, napomena: rForma.napomena.value.trim() });
+        $('rucno').close();
+        await ucitajMjesec(d.slice(0, 7));
+      } catch (er) {
+        g.textContent = 'Spremanje nije uspjelo (sat je možda u međuvremenu zauzet, ili u Firebaseu nisu zalijepljena nova pravila). Greška: ' + (er.code || er.message);
+      }
+      gumb.disabled = false;
+    });
+    $('rZatvori').onclick = () => $('rucno').close();
     $('povijest').addEventListener('click', e => { if (e.target === $('povijest')) $('povijest').close(); });
   </script>
 </body>
