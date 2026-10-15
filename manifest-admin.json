@@ -1,8 +1,8 @@
 {
-  "id": "edi-frizer",
-  "name": "Edi Frizer – termini",
-  "short_name": "Edi Frizer",
-  "description": "Pregled i otkazivanje termina (samo za frizera)",
+  "id": "salon-admin",
+  "name": "Moj Salon – termini",
+  "short_name": "Termini",
+  "description": "Pregled i otkazivanje termina (samo za vlasnika salona)",
   "start_url": "admin.html",
   "scope": "./",
   "display": "standalone",

@@ -129,7 +129,7 @@ footer {
   gap: 4px;
 }
 
-/* Popis termina (frizer i klijent) */
+/* Popis termina (salon i klijent) */
 .dan { margin: 30px 0 12px; font-size: 1.5rem; text-transform: capitalize; letter-spacing: 0; }
 .termin {
   display: flex; justify-content: space-between; align-items: center;
@@ -156,7 +156,7 @@ footer {
 /* hidden mora uvijek vrijediti (inače ga form { display: grid } poništi) */
 [hidden] { display: none !important; }
 
-/* Frizer: termini po danima (klik na dan otvara termine tog dana) */
+/* Admin: termini po danima (klik na dan otvara termine tog dana) */
 .dan-blok { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
 .dan-blok summary {
   display: flex; align-items: center; gap: 10px; padding: 16px 20px; cursor: pointer; list-style: none;
@@ -179,6 +179,7 @@ footer {
 
 .hero-app { min-height: calc(100vh - 200px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; }
 .veliki-logo { width: min(80vw, 360px); height: auto; }
+.naziv-logo { font-size: clamp(2.6rem, 13vw, 4.4rem); line-height: 1; text-align: center; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
 .gumbi { display: grid; gap: 12px; width: min(100%, 320px); }
 .gumbi .btn, .gumbi .btn-otkazi { width: 100%; text-align: center; padding: 14px; font-size: 1.05rem; }
 .info-blok { text-align: center; padding: 40px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; justify-items: center; }
@@ -223,7 +224,7 @@ footer {
 .btn-otkazi.opasno { color: var(--crvena); border-color: var(--crvena); }
 .btn-otkazi.opasno:hover { background: var(--crvena); color: #fff; }
 
-/* Kalendar (naručivanje i frizer) */
+/* Kalendar (naručivanje i admin) */
 .polje { display: grid; gap: 6px; font-weight: 500; min-width: 0; }
 .kalendar { background: var(--field); border: 1.5px solid #5a5758; border-radius: 8px; padding: 12px; font-weight: 400; }
 .kal-glava { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
@@ -249,7 +250,7 @@ footer {
 .sat.odabran { background: var(--naglasak); color: var(--na-naglasku); border-color: var(--naglasak); }
 .sazetak { background: var(--field); border-left: 4px solid var(--naglasak); border-radius: 4px; padding: 12px 14px; font-weight: 500; }
 
-/* Frizer: termini odabranog dana */
+/* Admin: termini odabranog dana */
 .dan-naslov { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 12px; }
 .dan-naslov h2 { margin: 0; font-size: 1.6rem; text-transform: none; letter-spacing: 0; }
 .dan-naslov h2::first-letter { text-transform: uppercase; }
@@ -261,7 +262,7 @@ footer {
 .kontakt a { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 500; font-size: 1.1rem; text-decoration: none; justify-self: start; }
 .kontakt a:hover { text-decoration: underline; }
 
-/* Frizer: povijest klijenta, oznake "nije došao" i duga */
+/* Admin: povijest klijenta, oznake "nije došao" i duga */
 .termin .info.klik { cursor: pointer; }
 .termin .info.klik strong { text-decoration: underline; text-decoration-color: #6b6768; text-underline-offset: 3px; }
 .gumbi-termin { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -276,7 +277,7 @@ footer {
 .pravilo { color: var(--muted); font-size: .9rem; font-weight: 400; }
 .kasno-upozorenje { display: block; margin-top: 8px; color: var(--crvena); font-weight: 700; }
 
-/* Frizer: brojke u povijesti klijenta */
+/* Admin: brojke u povijesti klijenta */
 .cipovi { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
 .cip { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: .9rem; color: var(--ink); }
 .cip.losa { border-color: var(--greska); color: var(--greska); }

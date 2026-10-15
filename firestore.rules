@@ -1,10 +1,11 @@
 rules_version = '2';
 // Pravila za Firestore bazu. Kopiraju se u Firebase konzolu: Firestore Database -> Rules -> Publish.
+// PRIJE KOPIRANJA: upiši email vlasnika salona (isti kao emailVlasnika u postavke.js).
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function prijavljen() { return request.auth != null; }
-    function frizer() { return prijavljen() && request.auth.token.email == 'bornapavicic85@gmail.com'; }
+    function vlasnik() { return prijavljen() && request.auth.token.email == 'vlasnik@email.com'; }
     function dobarTel(t) { return t is string && t.matches('^(09[1-9][0-9]{6,7}|[+][1-9][0-9]{7,14})$'); }
     function dobroIme(i) { return i is string && i.size() >= 2 && i.size() <= 50; }
     function put(kolekcija, id) { return /databases/$(database)/documents/$(kolekcija)/$(id); }
@@ -22,7 +23,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['datum', 'vrijeme'])
         && id == request.resource.data.datum + '_' + request.resource.data.vrijeme
         && existsAfter(put('termini', id));
-      allow delete: if frizer()
+      allow delete: if vlasnik()
         || (prijavljen() && get(put('termini', id)).data.uid == request.auth.uid);
     }
 
@@ -32,13 +33,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid', 'datum'])
         && request.resource.data.uid == request.auth.uid
         && id == request.auth.uid + '_' + request.resource.data.datum;
-      allow delete: if frizer() || (prijavljen() && id.matches('^' + request.auth.uid + '_.*'));
+      allow delete: if vlasnik() || (prijavljen() && id.matches('^' + request.auth.uid + '_.*'));
     }
 
-    // Termini: vidi ih frizer i vlasnik; frizer smije samo označiti "nije došao" / "platio".
+    // Termini: vidi ih vlasnik salona i klijent; vlasnik smije samo označiti "nije došao" / "platio".
     // Kasno otkazan termin (manje od 8 sati prije) seli se u termini/{id}_k i plaća se kao propušteni.
     match /termini/{id} {
-      allow read: if frizer() || (prijavljen() && resource.data.uid == request.auth.uid);
+      allow read: if vlasnik() || (prijavljen() && resource.data.uid == request.auth.uid);
       allow create: if prijavljen()
         && request.resource.data.keys().hasOnly(['ime', 'tel', 'usluga', 'datum', 'vrijeme', 'napomena', 'created', 'uid'])
         && request.resource.data.uid == request.auth.uid
@@ -61,11 +62,11 @@ service cloud.firestore {
         && request.resource.data.otkazanKasno == true
         && request.resource.data.nijeDosao == true
         && request.resource.data.podmireno == false;
-      allow update: if frizer()
+      allow update: if vlasnik()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nijeDosao', 'podmireno']);
       // Klijent briše svoj termin: ne ako duguje za njega; manje od 8 sati prije samo kao kasni otkaz (_k);
-      // prošle termine tek 2 dana kasnije (da frizer stigne označiti "nije došao")
-      allow delete: if frizer()
+      // prošle termine tek 2 dana kasnije (da salon stigne označiti "nije došao")
+      allow delete: if vlasnik()
         || (prijavljen() && resource.data.uid == request.auth.uid && !neplacen(resource.data)
             && (kada(resource.data) > request.time + duration.value(8, 'h')
                 || kada(resource.data) < request.time - duration.value(2, 'd')

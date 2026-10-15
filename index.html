@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Edi Barbershop</title>
+  <title>Naručivanje</title>
   <meta name="theme-color" content="#201f20">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png">
@@ -44,7 +44,8 @@
   <!-- ===== POČETNA ===== -->
   <section class="view" id="v-pocetna">
     <div class="hero-app">
-      <img class="veliki-logo" src="logo.svg" alt="Edi Barbershop">
+      <img class="veliki-logo" id="logo" alt="" hidden>
+      <h1 class="naziv-logo" id="nazivLogo"></h1>
       <div class="gumbi" data-out>
         <button class="btn" type="button" data-go="prijava" data-i18n="prijava">Prijava</button>
         <button class="btn-otkazi" type="button" data-go="registracija" data-i18n="registracija">Registracija</button>
@@ -60,34 +61,25 @@
     </div>
     <div class="info-blok">
       <svg class="ik veliki"><use href="#i-phone"/></svg>
-      <a href="tel:+385916181422">091 618 1422</a>
+      <a id="telefon"></a>
     </div>
     <div class="info-blok">
       <svg class="ik veliki"><use href="#i-pin"/></svg>
       <h2 data-i18n="posjeti">Posjeti nas</h2>
-      <p>Gajeva ul. 29A, Zagreb</p>
-      <a href="https://www.google.com/maps/search/?api=1&query=Gajeva+ul.+29A+Zagreb" target="_blank" rel="noopener" data-i18n="otvori_kartu">Otvori u kartama</a>
+      <p id="adresa"></p>
+      <a id="karta" target="_blank" rel="noopener" data-i18n="otvori_kartu">Otvori u kartama</a>
     </div>
     <div class="info-blok">
       <svg class="ik veliki"><use href="#i-clock"/></svg>
       <h2 data-i18n="radno_h">Radno vrijeme</h2>
-      <div class="sati">
-        <span data-i18n="r_pon">Ponedjeljak – Petak</span><strong>10:00 – 20:00</strong>
-        <span data-i18n="r_sub">Subota</span><strong>10:00 – 18:00</strong>
-        <span data-i18n="r_ned">Nedjelja</span><strong data-i18n="r_zatvoreno">Zatvoreno</strong>
-      </div>
+      <div class="sati" id="sati"></div>
     </div>
   </section>
 
   <!-- ===== USLUGE ===== -->
   <section class="view" id="v-usluge" hidden>
     <h2 data-i18n="usluge_h">Usluge i cijene</h2>
-    <ul class="cjenik">
-      <li><span data-i18n="u1">Fade šišanje</span><span class="dots"></span><span>20 €</span></li>
-      <li><span data-i18n="u2">Uređivanje brade</span><span class="dots"></span><span>15 €</span></li>
-      <li><span data-i18n="u3">Šišanje i brada</span><span class="dots"></span><span>30 €</span></li>
-      <li><span data-i18n="u4">Pranje kose</span><span class="dots"></span><span>3 €</span></li>
-    </ul>
+    <ul class="cjenik" id="cjenik"></ul>
     <p style="margin-top:28px"><button class="btn" type="button" data-go="rezervacija" data-i18n="naruci">Naruči termin</button></p>
   </section>
 
@@ -182,10 +174,6 @@
         <label><span data-i18n="lbl_usluga">Usluga</span>
           <select name="usluga" required>
             <option value="" data-i18n="opt_usluga">Odaberi uslugu</option>
-            <option value="Fade šišanje (20 €)" data-i18n="u1">Fade šišanje</option>
-            <option value="Uređivanje brade (15 €)" data-i18n="u2">Uređivanje brade</option>
-            <option value="Šišanje i brada (30 €)" data-i18n="u3">Šišanje i brada</option>
-            <option value="Pranje kose (3 €)" data-i18n="u4">Pranje kose</option>
           </select>
         </label>
         <div class="polje"><span data-i18n="lbl_datum">Datum</span>
@@ -200,7 +188,7 @@
           <textarea name="napomena" rows="3"></textarea>
         </label>
         <p class="sazetak" id="sazetak" hidden></p>
-        <p class="pravilo" data-i18n="pravilo_dolazak">Termin otkaži najkasnije 8 sati prije. Ako otkažeš kasnije ili ne dođeš, kod sljedećeg dolaska plaćaš i taj termin.</p>
+        <p class="pravilo" data-i18n="pravilo_dolazak"></p>
         <button class="btn" type="submit" data-i18n="potvrdi">Potvrdi narudžbu</button>
         <p id="poruka" role="status"></p>
       </form>
@@ -243,11 +231,11 @@
     <button class="nazad" type="button" data-go="postavke"><svg class="ik"><use href="#i-back"/></svg><span data-i18n="natrag">Natrag</span></button>
     <div class="narudzba">
       <h2 data-i18n="p_oapp">O aplikaciji</h2>
-      <p data-i18n="oapp_tekst">Edi Barbershop – online naručivanje termina.</p>
-      <div class="kontakt">
+      <p data-i18n="oapp_tekst"></p>
+      <div class="kontakt" id="izrada">
         <p data-i18n="oapp_kontakt">Za personalizirane aplikacije molimo kontaktirajte nas na WhatsApp ili Instagram.</p>
-        <a href="https://wa.me/385917979793" target="_blank" rel="noopener"><svg class="ik"><use href="#i-wa"/></svg>091 797 9793</a>
-        <a href="https://instagram.com/borna.pavicicc" target="_blank" rel="noopener"><svg class="ik"><use href="#i-insta"/></svg>borna.pavicicc</a>
+        <a id="izradaWa" target="_blank" rel="noopener"><svg class="ik"><use href="#i-wa"/></svg><span></span></a>
+        <a id="izradaInsta" target="_blank" rel="noopener"><svg class="ik"><use href="#i-insta"/></svg><span></span></a>
       </div>
     </div>
   </section>
@@ -279,18 +267,19 @@
   </nav>
 
   <script type="module">
-    import { Store, Auth, Profil, provjeriTel, cijena, satiDo, ROK_OTKAZA } from './app.js';
+    import { Store, Auth, Profil, provjeriTel, cijena, satiDo, ROK_OTKAZA, vrijednostUsluge, nadjiUslugu, satiZaDan, radiDan, DANI } from './app.js';
+    import { SALON, IZRADA } from './postavke.js';
     import { t, jezik } from './jezik.js';
     import { kalendar, ymd } from './kalendar.js';
     const $ = id => document.getElementById(id);
-    const INSTAGRAM = '_barbershopedi'; // korisničko ime bez @ (prazno = sakriveno)
+    const INSTAGRAM = SALON.instagram;
 
     // pogled -> koja kartica u donjoj traci svijetli
     const POGLEDI = { pocetna: 'pocetna', usluge: 'usluge', termini: 'termini', postavke: 'postavke',
       prijava: 'pocetna', registracija: 'pocetna', rezervacija: 'pocetna',
       profil: 'postavke', racun: 'postavke', oaplikaciji: 'postavke', obrisi: 'postavke' };
     const ZASTICENI = ['rezervacija', 'profil', 'racun', 'obrisi'];
-    const MAX_BUDUCIH = 2; // najviše budućih termina odjednom po osobi (i najviše 1 u danu)
+    const MAX_BUDUCIH = SALON.maxBuducih; // najviše budućih termina odjednom po osobi (i najviše 1 u danu)
     let korisnik = null, profil = null, spreman = false, tab = 'buduci';
 
     const poruci = (el, k, v, ok = false) => { el.textContent = k ? t(k, v) : ''; el.style.color = ok ? '#6fd39a' : ''; };
@@ -301,10 +290,9 @@
     const loc = () => jezik() === 'hr' ? 'hr-HR' : 'en-GB';
     const lijepDan = d => new Date(d + 'T00:00').toLocaleDateString(loc(), { weekday: 'long', day: 'numeric', month: 'long' });
 
-    // Usluge: cijene i prijevod naziva (u bazi je spremljeno npr. "Fade šišanje (20 €)")
-    const CIJENE = { u1: '20 €', u2: '15 €', u3: '30 €', u4: '3 €' };
-    const USLUGE = { 'Fade šišanje': 'u1', 'Uređivanje brade': 'u2', 'Šišanje i brada': 'u3', 'Pranje kose': 'u4' };
-    const nazivUsluge = u => { const k = USLUGE[String(u || '').replace(/\s*\(.*\)$/, '')]; return k ? `${t(k)} · ${CIJENE[k]}` : u; };
+    // Usluge iz postavki (u bazi je spremljeno npr. "Šišanje (20 €)"; stari termin zadržava staru cijenu)
+    const imeUsluge = u => u[jezik()] || u.hr;
+    const nazivUsluge = v => { const u = nadjiUslugu(v); return u ? `${imeUsluge(u)} · ${cijena(v)} €` : v; };
     const greskaKod = e => ({ 'auth/email-already-in-use': 'e_postoji', 'auth/weak-password': 'e_slaba', 'auth/invalid-email': 'e_email' })[e.code] || 'e_login';
 
     // ----- Usmjeravanje (#pocetna, #termini, ...) -----
@@ -456,23 +444,29 @@
 
     // ----- Naručivanje -----
     const forma = $('forma'), poruka = $('poruka'), satiEl = $('satiIzbor');
-    const SATI = Array.from({ length: 20 }, (_, i) => (10 + Math.floor(i / 2)) + (i % 2 ? ':30' : ':00')); // 10:00 … 19:30
     const msg = (k, v, ok = true) => { poruka.textContent = k ? t(k, v) : ''; poruka.style.color = ok ? '' : 'var(--greska)'; };
 
-    // Kalendar: prošli dani, nedjelje i dani dalje od 60 dana se ne mogu odabrati
+    // Kalendar: prošli dani, neradni dani i dani dalje od SALON.danaUnaprijed se ne mogu odabrati
     const danas = () => ymd(new Date());
-    const zadnji = () => { const d = new Date(); d.setDate(d.getDate() + 60); return ymd(d); };
+    const zadnji = () => { const d = new Date(); d.setDate(d.getDate() + SALON.danaUnaprijed); return ymd(d); };
     const kal = kalendar($('kalendar'), {
       loc, od: danas(), do: zadnji(),
-      onemoguci: d => d < danas() || d > zadnji() || new Date(d + 'T00:00').getDay() === 0,
+      onemoguci: d => d < danas() || d > zadnji() || !radiDan(d),
       odabir: d => { forma.datum.value = d; msg(''); osvjeziSate(); }
     });
 
-    // Cijena pored svake usluge u izborniku
+    // Usluge u cjeniku i u izborniku (naziv na odabranom jeziku + cijena)
     function cijeneUsluga() {
-      forma.usluga.querySelectorAll('option[data-i18n]').forEach(o => {
-        if (CIJENE[o.dataset.i18n]) o.textContent = `${t(o.dataset.i18n)} – ${CIJENE[o.dataset.i18n]}`;
+      const odabrana = forma.usluga.value;
+      forma.usluga.querySelectorAll('option:not([data-i18n])').forEach(o => o.remove());
+      $('cjenik').innerHTML = '';
+      SALON.usluge.forEach(u => {
+        forma.usluga.append(new Option(`${imeUsluge(u)} – ${u.cijena} €`, vrijednostUsluge(u)));
+        const li = document.createElement('li');
+        ['', 'dots', ''].forEach((cls, i) => { const s = document.createElement('span'); if (cls) s.className = cls; s.textContent = i === 0 ? imeUsluge(u) : i === 2 ? u.cijena + ' €' : ''; li.append(s); });
+        $('cjenik').append(li);
       });
+      forma.usluga.value = odabrana;
     }
     // Kratki pregled odabranog termina iznad gumba
     function sazetak() {
@@ -511,9 +505,8 @@
       try {
         const zauzeti = await Store.takenOn(d);
         if (forma.datum.value !== d) return;
-        const dan = new Date(d + 'T00:00').getDay();
-        const sad = new Date(), sat = sad.toTimeString().slice(0, 5);
-        const slobodni = SATI.filter(s => (dan !== 6 || s < '18:00') && !zauzeti.has(s) && !(d === danas() && s <= sat));
+        const sat = new Date().toTimeString().slice(0, 5);
+        const slobodni = satiZaDan(d).filter(s => !zauzeti.has(s) && !(d === danas() && s <= sat));
         if (!slobodni.length) { satiPoruka('m_nema'); return; }
         satiEl.innerHTML = '';
         slobodni.forEach(s => {
@@ -568,6 +561,35 @@
       gumb.disabled = false;
     });
 
+    // ----- Podaci salona na početnoj (naziv/logo, kontakt, radno vrijeme) -----
+    function podaciSalona() {
+      if (SALON.logo) { $('logo').src = SALON.logo; $('logo').alt = SALON.naziv; $('logo').hidden = false; $('nazivLogo').hidden = true; }
+      $('nazivLogo').textContent = SALON.naziv;
+      $('telefon').textContent = SALON.telefon;
+      $('telefon').href = 'tel:' + SALON.telefon.replace(/[^\d+]/g, '').replace(/^00/, '+').replace(/^0/, '+385');
+      $('adresa').textContent = SALON.adresa;
+      $('karta').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(SALON.adresa);
+      $('izrada').hidden = !IZRADA.whatsapp && !IZRADA.instagram;
+      $('izradaWa').hidden = !IZRADA.whatsapp; $('izradaWa').href = 'https://wa.me/' + IZRADA.whatsapp;
+      $('izradaWa').querySelector('span').textContent = IZRADA.whatsappTekst || IZRADA.whatsapp;
+      $('izradaInsta').hidden = !IZRADA.instagram; $('izradaInsta').href = 'https://instagram.com/' + IZRADA.instagram;
+      $('izradaInsta').querySelector('span').textContent = IZRADA.instagram;
+    }
+    // Radno vrijeme: uzastopni dani s istim satima spajaju se, npr. "Ponedjeljak – Petak  09:00 – 20:00"
+    function radnoVrijeme() {
+      const red = ['pon', 'uto', 'sri', 'cet', 'pet', 'sub', 'ned'];
+      const ime = k => { const s = new Date(2024, 0, 7 + DANI.indexOf(k)).toLocaleDateString(loc(), { weekday: 'long' }); return s[0].toUpperCase() + s.slice(1); };
+      const sati = k => { const r = SALON.radnoVrijeme[k]; return r ? `${r[0]} – ${r[1]}` : ''; };
+      const el = $('sati'); el.innerHTML = '';
+      for (let i = 0; i < red.length;) {
+        let j = i; while (j + 1 < red.length && sati(red[j + 1]) === sati(red[i])) j++;
+        const dani = document.createElement('span'); dani.textContent = i === j ? ime(red[i]) : `${ime(red[i])} – ${ime(red[j])}`;
+        const s = document.createElement('strong'); s.textContent = sati(red[i]) || t('r_zatvoreno');
+        el.append(dani, s);
+        i = j + 1;
+      }
+    }
+
     // ----- Stanje prijave -----
     Auth.onChange(async u => {
       korisnik = u; spreman = true;
@@ -578,7 +600,9 @@
       osvjeziUI(); podaci(); ucitajProfilPolja();
       render();
     });
-    document.addEventListener('jezik', () => { podaci(); cijeneUsluga(); kal.crtaj(); render(); sazetak(); });
+    document.addEventListener('jezik', () => { podaci(); cijeneUsluga(); radnoVrijeme(); kal.crtaj(); render(); sazetak(); });
+    podaciSalona();
+    radnoVrijeme();
     cijeneUsluga();
     osvjeziUI();
     render();
