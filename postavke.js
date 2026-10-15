@@ -11,7 +11,7 @@ export const SALON = {
   instagram: '',               // korisničko ime bez @ (prazno = sakriveno)
 
   // Email s kojim se vlasnik prijavljuje u admin.html (isti mora biti i u firestore.rules)
-  emailVlasnika: 'vlasnik@email.com',
+  emailVlasnika: 'bornapavicic85@gmail.com',
 
   // Radno vrijeme po danima: [otvara, zatvara], null = zatvoreno
   radnoVrijeme: {

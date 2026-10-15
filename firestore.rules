@@ -5,7 +5,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function prijavljen() { return request.auth != null; }
-    function vlasnik() { return prijavljen() && request.auth.token.email == 'vlasnik@email.com'; }
+    function vlasnik() { return prijavljen() && request.auth.token.email == 'bornapavicic85@gmail.com'; }
     function dobarTel(t) { return t is string && t.matches('^(09[1-9][0-9]{6,7}|[+][1-9][0-9]{7,14})$'); }
     function dobroIme(i) { return i is string && i.size() >= 2 && i.size() <= 50; }
     function put(kolekcija, id) { return /databases/$(database)/documents/$(kolekcija)/$(id); }
