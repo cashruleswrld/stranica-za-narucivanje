@@ -23,7 +23,7 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - `jezik.js` – prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
 - `style.css` – tamnosiva tema (pozadina #2b2a2b, kartice #363435), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
 - `firestore.rules` – pravila baze (email vlasnika u funkciji `vlasnik()`, rok otkaza 8 h). **Ne primjenjuju se sama**: lijepe se u Firebase konzolu.
-- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v1`); novi JS fajl dodaj u `FILES`.
+- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v3`); novi JS fajl dodaj u `FILES`.
 - `racun.html` – samo preusmjerenje.
 
 ## Baza (Firestore, Spark besplatni plan; Auth samo email+lozinka; svaki salon ima SVOJ Firebase projekt)
