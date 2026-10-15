@@ -21,17 +21,17 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - `app.js` – Firebase (SDK 10.12.2 s gstatic CDN-a). Izvozi `Store`, `Profil`, `Auth`, `provjeriTel`, `cijena`, `satiDo`, `ROK_OTKAZA`, `vrijednostUsluge`, `nadjiUslugu`, `satiZaDan`, `radiDan`, `DANI`.
 - `kalendar.js` – zajednički kalendar (`kalendar(el, {loc, odabir, onemoguci, oznaka, od, do, naMjesec})`, `ymd`).
 - `jezik.js` – prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
-- `style.css` – tamnosiva tema (pozadina #2b2a2b, kartice #363435), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
+- `style.css` – crna tema (pozadina #0b0b0c s blagim sivim sjajem na vrhu, kartice #161618), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
 - `firestore.rules` – pravila baze (email vlasnika u funkciji `vlasnik()`, rok otkaza 8 h). **Ne primjenjuju se sama**: lijepe se u Firebase konzolu.
-- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v3`); novi JS fajl dodaj u `FILES`.
+- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v4`); novi JS fajl dodaj u `FILES`.
 - `racun.html` – samo preusmjerenje.
 
 ## Baza (Firestore, Spark besplatni plan; Auth samo email+lozinka; svaki salon ima SVOJ Firebase projekt)
 - `slots/{datum_vrijeme}` – zauzeti sati (bez osobnih podataka).
 - `termini/{datum_vrijeme}` – {ime, tel, usluga, datum, vrijeme, napomena, created, uid, [nijeDosao, podmireno]}.
 - `termini/{datum_vrijeme}_k` – kasno otkazan termin: kopija + {otkazanKasno, nijeDosao: true, podmireno: false}.
-- `dnevno/{uid}_{datum}` – najviše 1 termin u danu po osobi.
-- `korisnici/{uid}` – {ime, tel}.
+- `dnevno/{uid}_{datum}` – najviše 1 termin u danu po osobi; piše se samo ako je `jedanTerminDnevno: true` (trenutno isključeno, kao i `maxBuducih: 0`).
+- `korisnici/{uid}` – {ime, tel}. Promjena u profilu upisuje novo ime/mobitel i u buduće termine te osobe (pravila to dopuštaju samo za `ime` i `tel`).
 - Naručivanje je batch (slot + dnevno + termin). Neplaćen nedolazak / kasni otkaz = dug.
 - Paziti na limit od 50.000 čitanja dnevno: ne učitavati cijelu kolekciju `termini`.
 - Termini su jedan po jedan (jedna osoba radi); više zaposlenika istovremeno zasad nije podržano.
