@@ -1,6 +1,6 @@
 {
   "id": "salon-admin",
-  "name": "Moj Salon – termini",
+  "name": "Studio Lana – termini",
   "short_name": "Termini",
   "description": "Pregled i otkazivanje termina (samo za vlasnika salona)",
   "start_url": "admin.html",

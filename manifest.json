@@ -1,6 +1,6 @@
 {
-  "name": "Moj Salon",
-  "short_name": "Moj Salon",
+  "name": "Studio Lana",
+  "short_name": "Studio Lana",
   "description": "Online naručivanje termina",
   "start_url": "index.html",
   "display": "standalone",
