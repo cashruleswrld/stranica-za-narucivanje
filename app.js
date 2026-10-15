@@ -12,7 +12,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // "slots" = javno vidljivi zauzeti sati (bez imena), "termini" = pravi podaci (vidi ih samo vlasnik salona i klijent),
-// "dnevno" = oznaka {uid}_{datum} koja sprječava da jedna osoba ima više od jednog termina u danu
+// "dnevno" = oznaka {uid}_{datum} koja sprječava da jedna osoba ima više od jednog termina u danu (ako je SALON.jedanTerminDnevno)
 const dnevnoId = (uid, datum) => `${uid}_${datum}`;
 const lista = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
 export const Store = {
@@ -26,7 +26,7 @@ export const Store = {
     const id = `${t.datum}_${t.vrijeme}`;
     const b = writeBatch(db);
     b.set(doc(db, 'slots', id), { datum: t.datum, vrijeme: t.vrijeme });
-    b.set(doc(db, 'dnevno', dnevnoId(uid, t.datum)), { uid, datum: t.datum });
+    if (SALON.jedanTerminDnevno) b.set(doc(db, 'dnevno', dnevnoId(uid, t.datum)), { uid, datum: t.datum });
     b.set(doc(db, 'termini', id), { ...t, uid, created: serverTimestamp() });
     await b.commit(); // ako je sat zauzet ili osoba taj dan već ima termin, cijela operacija ne uspije
   },
@@ -105,9 +105,16 @@ export const Profil = {
     const d = await getDoc(doc(db, 'korisnici', uid));
     return d.exists() ? d.data() : null;
   },
+  // Novo ime/mobitel upisuje se i u već zakazane (buduće) termine, da ih salon vidi
   async set(user, ime, tel) {
     await updateProfile(user, { displayName: ime });
     await setDoc(doc(db, 'korisnici', user.uid), { ime, tel });
+    const danas = new Date().toLocaleDateString('sv-SE');
+    const buduci = (await Store.mine(user.uid)).filter(t => t.datum >= danas && !t.otkazanKasno && (t.ime !== ime || t.tel !== tel));
+    if (!buduci.length) return;
+    const b = writeBatch(db);
+    buduci.forEach(t => b.update(doc(db, 'termini', t.id), { ime, tel }));
+    await b.commit();
   }
 };
 

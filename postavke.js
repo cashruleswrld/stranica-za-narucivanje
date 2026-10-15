@@ -34,7 +34,8 @@ export const SALON = {
   ],
 
   danaUnaprijed: 60,           // koliko dana unaprijed se može naručiti
-  maxBuducih: 2,               // najviše budućih termina po osobi (i najviše 1 u danu)
+  maxBuducih: 0,               // najviše budućih termina po osobi (0 = bez ograničenja)
+  jedanTerminDnevno: false,    // true = osoba može imati najviše 1 termin u danu
   rokOtkaza: 8                 // sati; ako mijenjaš, promijeni i "8" u firestore.rules
 };
 

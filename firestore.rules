@@ -27,7 +27,7 @@ service cloud.firestore {
         || (prijavljen() && get(put('termini', id)).data.uid == request.auth.uid);
     }
 
-    // Oznaka {uid}_{datum}: jedna osoba može imati najviše jedan termin u danu
+    // Oznaka {uid}_{datum}: jedna osoba može imati najviše jedan termin u danu (koristi se samo ako je uključeno u postavke.js)
     match /dnevno/{id} {
       allow create: if prijavljen()
         && request.resource.data.keys().hasOnly(['uid', 'datum'])
@@ -51,8 +51,7 @@ service cloud.firestore {
         && request.resource.data.usluga is string && request.resource.data.usluga.size() <= 60
         && request.resource.data.napomena is string && request.resource.data.napomena.size() <= 500
         && request.resource.data.created == request.time
-        && existsAfter(put('slots', id))
-        && existsAfter(put('dnevno', request.auth.uid + '_' + request.resource.data.datum));
+        && existsAfter(put('slots', id));
       allow create: if prijavljen()
         && id == request.resource.data.datum + '_' + request.resource.data.vrijeme + '_k'
         && get(put('termini', request.resource.data.datum + '_' + request.resource.data.vrijeme)).data.uid == request.auth.uid
@@ -64,6 +63,11 @@ service cloud.firestore {
         && request.resource.data.podmireno == false;
       allow update: if vlasnik()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nijeDosao', 'podmireno']);
+      // Klijent promijeni ime/mobitel u profilu -> ažurira se i u njegovim zakazanim terminima
+      allow update: if prijavljen() && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ime', 'tel'])
+        && dobroIme(request.resource.data.ime)
+        && dobarTel(request.resource.data.tel);
       // Klijent briše svoj termin: ne ako duguje za njega; manje od 8 sati prije samo kao kasni otkaz (_k);
       // prošle termine tek 2 dana kasnije (da salon stigne označiti "nije došao")
       allow delete: if vlasnik()
