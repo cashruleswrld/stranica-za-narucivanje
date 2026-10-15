@@ -10,7 +10,7 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - **Sve što je specifično za jedan salon je u `postavke.js`**: naziv, logo, telefon, adresa, Instagram, email vlasnika,
   radno vrijeme po danima, trajanje termina, usluge (hr/en naziv + cijena), dana unaprijed, max budućih termina, rok otkaza, Firebase config.
   Kod ne smije imati podatke konkretnog salona; novo podešavanje dodaj u `postavke.js`.
-- Za novog klijenta mijenja se još: email u `firestore.rules`, naziv u `manifest.json` / `manifest-admin.json`, po želji `icon-192.png` / `icon-512.png` i logo.
+- Za novog klijenta mijenja se još: email u `firestore.rules`, naziv u `manifest.json` / `manifest-admin.json`, po želji ikone `icon-192.png` / `icon-512.png` / `apple-touch-icon.png` (180 px, za iPhone) i logo.
 - Usluga se uz termin sprema kao "Naziv (20 €)" pa stari termini pamte staru cijenu.
 - Tekstovi su rodno neutralni (klijenti mogu biti i muški i ženski).
 
@@ -23,7 +23,7 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - `jezik.js` – prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
 - `style.css` – crna tema (pozadina #0b0b0c s blagim sivim sjajem na vrhu, kartice #161618), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
 - `firestore.rules` – pravila baze (email vlasnika u funkciji `vlasnik()`, rok otkaza 8 h). **Ne primjenjuju se sama**: lijepe se u Firebase konzolu.
-- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v4`); novi JS fajl dodaj u `FILES`.
+- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v5`); novi JS fajl dodaj u `FILES`.
 - `racun.html` – samo preusmjerenje.
 
 ## Baza (Firestore, Spark besplatni plan; Auth samo email+lozinka; svaki salon ima SVOJ Firebase projekt)
