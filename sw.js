@@ -1,4 +1,4 @@
-const CACHE = 'salon-v1';
+const CACHE = 'salon-v2';
 const FILES = ['index.html', 'admin.html', 'style.css', 'postavke.js', 'app.js', 'jezik.js', 'kalendar.js', 'manifest.json', 'manifest-admin.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

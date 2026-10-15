@@ -47,10 +47,10 @@ export const IZRADA = {
 
 // Firebase projekt ovog salona (Firebase konzola → Project settings → Your apps → Web app → Config)
 export const FIREBASE = {
-  apiKey: 'UPISI_API_KEY',
-  authDomain: 'UPISI_PROJEKT.firebaseapp.com',
-  projectId: 'UPISI_PROJEKT',
-  storageBucket: 'UPISI_PROJEKT.firebasestorage.app',
-  messagingSenderId: 'UPISI',
-  appId: 'UPISI'
+  apiKey: 'AIzaSyBmwpJtipxRnofcEGK4RJX85Vjm8BxazrI',
+  authDomain: 'stranica-za-narucivanje.firebaseapp.com',
+  projectId: 'stranica-za-narucivanje',
+  storageBucket: 'stranica-za-narucivanje.firebasestorage.app',
+  messagingSenderId: '746009900269',
+  appId: '1:746009900269:web:234c0d42d24fa9270608e4'
 };
