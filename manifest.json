@@ -1,7 +1,7 @@
 {
-  "name": "Edi Barbershop",
-  "short_name": "Edi",
-  "description": "Naruči termin kod frizera",
+  "name": "Moj Salon",
+  "short_name": "Moj Salon",
+  "description": "Online naručivanje termina",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#363435",

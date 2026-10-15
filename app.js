@@ -5,18 +5,13 @@ import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, wr
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider, deleteUser, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSyCFNyjQYyqBgmwteiyvl0sztHdzNhv-Iw0",
-  authDomain: "edi-barbershop.firebaseapp.com",
-  projectId: "edi-barbershop",
-  storageBucket: "edi-barbershop.firebasestorage.app",
-  messagingSenderId: "842508579930",
-  appId: "1:842508579930:web:d71ac9a5c8b16a23191463"
-});
+import { FIREBASE, SALON } from './postavke.js';
+
+const app = initializeApp(FIREBASE);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// "slots" = javno vidljivi zauzeti sati (bez imena), "termini" = pravi podaci (vidi ih samo frizer i vlasnik),
+// "slots" = javno vidljivi zauzeti sati (bez imena), "termini" = pravi podaci (vidi ih samo vlasnik salona i klijent),
 // "dnevno" = oznaka {uid}_{datum} koja sprječava da jedna osoba ima više od jednog termina u danu
 const dnevnoId = (uid, datum) => `${uid}_${datum}`;
 const lista = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -35,11 +30,11 @@ export const Store = {
     b.set(doc(db, 'termini', id), { ...t, uid, created: serverTimestamp() });
     await b.commit(); // ako je sat zauzet ili osoba taj dan već ima termin, cijela operacija ne uspije
   },
-  // Frizer: termini od..do (npr. jedan mjesec), da se ne učitava cijela povijest odjednom
+  // Vlasnik salona: termini od..do (npr. jedan mjesec), da se ne učitava cijela povijest odjednom
   async razdoblje(od, doDatuma) {
     return lista(await getDocs(query(collection(db, 'termini'), where('datum', '>=', od), where('datum', '<=', doDatuma))));
   },
-  // Svi termini jedne osobe (klijent svoje, frizer bilo čije)
+  // Svi termini jedne osobe (klijent svoje, vlasnik salona bilo čije)
   async mine(uid) {
     return lista(await getDocs(query(collection(db, 'termini'), where('uid', '==', uid))));
   },
@@ -48,7 +43,7 @@ export const Store = {
     const s = await getDocs(query(collection(db, 'termini'), where('uid', '==', uid), where('nijeDosao', '==', true)));
     return lista(s).filter(t => !t.podmireno);
   },
-  // Otkaz manje od 8 sati prije termina: sat se oslobađa, a termin ostaje zapisan kao dug (termini/{id}_k)
+  // Otkaz manje od ROK_OTKAZA sati prije termina: sat se oslobađa, a termin ostaje zapisan kao dug (termini/{id}_k)
   async otkaziKasno(t) {
     const { id, ...podaci } = t;
     const b = writeBatch(db);
@@ -58,7 +53,7 @@ export const Store = {
     b.set(doc(db, 'termini', id + '_k'), { ...podaci, otkazanKasno: true, nijeDosao: true, podmireno: false });
     await b.commit();
   },
-  // Frizer: oznaka "nije došao" / "platio"
+  // Vlasnik salona: oznaka "nije došao" / "platio"
   oznaci: (id, polja) => updateDoc(doc(db, 'termini', id), polja),
   async remove(t) {
     const b = writeBatch(db);
@@ -69,15 +64,32 @@ export const Store = {
   }
 };
 
-// Cijena iz spremljenog naziva usluge, npr. "Fade šišanje (20 €)" -> 20
 // Koliko je sati do termina (negativno ako je prošao)
 export const satiDo = t => (new Date(`${t.datum}T${t.vrijeme}`) - new Date()) / 36e5;
-export const ROK_OTKAZA = 8; // sati
+export const ROK_OTKAZA = SALON.rokOtkaza; // sati
 
+// Usluga se uz termin sprema s cijenom, npr. "Šišanje (20 €)", pa stari termini pamte staru cijenu
+export const vrijednostUsluge = u => `${u.hr} (${u.cijena} €)`;
+export const nadjiUslugu = v => SALON.usluge.find(u => u.hr === String(v || '').replace(/\s*\(.*\)$/, ''));
+// Cijena iz spremljenog naziva usluge, npr. "Šišanje (20 €)" -> 20
 export const cijena = usluga => +((String(usluga || '').match(/\((\d+)\s*€\)/) || [])[1] || 0);
 
 // Provjera broja mobitela: hrvatski mobitel (091 234 5678, +385 91 234 5678) ili inozemni (+43 ...)
 // Vraća očišćen broj ili null ako nije pravi broj
+// Radno vrijeme: ključevi u postavkama po danu u tjednu (getDay(): 0 = nedjelja)
+export const DANI = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
+const uMinute = s => +s.slice(0, 2) * 60 + +s.slice(3, 5);
+const uSat = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+export const radiDan = datum => !!SALON.radnoVrijeme[DANI[new Date(datum + 'T00:00').getDay()]];
+// Svi početci termina u danu, npr. 09:00, 09:30 … (zadnji završava kad salon zatvara)
+export function satiZaDan(datum) {
+  const r = SALON.radnoVrijeme[DANI[new Date(datum + 'T00:00').getDay()]];
+  if (!r) return [];
+  const sati = [];
+  for (let m = uMinute(r[0]); m + SALON.trajanjeTermina <= uMinute(r[1]); m += SALON.trajanjeTermina) sati.push(uSat(m));
+  return sati;
+}
+
 export function provjeriTel(v) {
   let t = String(v || '').trim().replace(/[\s\-\/().]/g, '');
   if (t.startsWith('00')) t = '+' + t.slice(2);
@@ -114,7 +126,7 @@ export const Auth = {
     const moji = await Store.mine(u.uid);
     const greska = code => { const e = new Error(code); e.code = code; throw e; };
     if (moji.some(t => t.nijeDosao && !t.podmireno)) greska('dug');
-    // Termini od prije 2 dana do 8 sati unaprijed ne mogu se obrisati (frizer još može označiti "nije došao")
+    // Termini od prije 2 dana do ROK_OTKAZA sati unaprijed ne mogu se obrisati (salon još može označiti nedolazak)
     if (moji.some(t => !t.otkazanKasno && satiDo(t) > -50 && satiDo(t) <= ROK_OTKAZA)) greska('blizu');
     for (const t of moji) await Store.remove(t);
     await deleteDoc(doc(db, 'korisnici', u.uid));

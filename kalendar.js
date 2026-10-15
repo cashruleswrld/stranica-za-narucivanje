@@ -1,4 +1,4 @@
-// Kalendar po mjesecima: klijent bira dan za termin, frizer gleda termine po danima.
+// Kalendar po mjesecima: klijent bira dan za termin, vlasnik salona gleda termine po danima.
 // Opcije: loc() -> 'hr-HR' / 'en-GB', odabir(datum), onemoguci(datum) -> true/false,
 // oznaka(datum) -> tekst značke (npr. broj termina), od / do -> 'YYYY-MM-DD' granice za strelice,
 // naMjesec('YYYY-MM') -> poziva se kad se prikaže drugi mjesec
