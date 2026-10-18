@@ -307,3 +307,23 @@ footer {
   .post-dan select { padding: 8px 4px; }
 }
 .post-dan .prazno { margin: 0; }
+
+/* ===== Računalo: traka gore, širi sadržaj (na mobitelu ostaje donja traka) ===== */
+.tab-naziv { display: none; }
+@media (min-width: 900px) {
+  .tabbar { top: 0; bottom: auto; height: 68px; align-items: stretch; justify-content: flex-end; gap: 4px; padding: 0 140px 0 6vw; border-top: 0; border-bottom: 1px solid var(--line); }
+  .tab-naziv { display: block; margin-right: auto; background: none; border: 0; color: var(--ink); font: 700 1.6rem "Barlow Condensed", sans-serif; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+  .tab { flex: none; display: flex; align-items: center; gap: 8px; padding: 0 18px; font-size: 1rem; }
+  .tab .ik { width: 20px; height: 20px; }
+  .tab:hover { color: var(--ink); }
+  .tab.aktivno { box-shadow: inset 0 -3px 0 var(--naglasak); }
+  .app .jezik { top: 14px; right: 24px; }
+  .view { max-width: 680px; padding: 120px 32px 80px; }
+  #toast { bottom: 32px; }
+
+  /* Početna: naslov preko cijele širine, podaci salona u karticama jedna do druge */
+  #v-pocetna { max-width: 1200px; display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 20px; }
+  #v-pocetna .hero-app { flex: 1 0 100%; min-height: 48vh; }
+  #v-pocetna .info-blok { flex: 0 1 340px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 32px 28px; align-content: start; }
+  #v-pocetna .info-blok h2 { font-size: 1.4rem; }
+}

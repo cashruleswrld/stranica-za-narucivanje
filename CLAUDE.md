@@ -25,9 +25,9 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - `app.js` – Firebase (SDK 10.12.2 s gstatic CDN-a). Izvozi `Store`, `Profil`, `Auth`, `Postavke`, `provjeriTel`, `cijena`, `satiDo`, `ROK_OTKAZA`, `vrijednostUsluge`, `nadjiUslugu`, `satiZaDan`, `radiDan`, `blagdan`, `DANI`.
 - `kalendar.js` – zajednički kalendar (`kalendar(el, {loc, odabir, onemoguci, oznaka, od, do, naMjesec})`, `ymd`).
 - `jezik.js` – uvozi `app.js` (da postavke iz baze budu učitane prije prijevoda). Prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
-- `style.css` – crna tema (pozadina #0b0b0c s blagim sivim sjajem na vrhu, kartice #161618), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
+- `style.css` – na mobitelu donja traka, na računalu (≥ 900 px) traka gore s nazivom salona i kartice na početnoj. Crna tema (pozadina #0b0b0c s blagim sivim sjajem na vrhu, kartice #161618), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
 - `firestore.rules` – pravila baze (email vlasnika u funkciji `vlasnik()`, rok otkaza 8 h). **Ne primjenjuju se sama**: lijepe se u Firebase konzolu.
-- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v7`); novi JS fajl dodaj u `FILES`.
+- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v8`); novi JS fajl dodaj u `FILES`.
 - `racun.html` – samo preusmjerenje.
 
 ## Baza (Firestore, Spark besplatni plan; Auth samo email+lozinka; svaki salon ima SVOJ Firebase projekt)

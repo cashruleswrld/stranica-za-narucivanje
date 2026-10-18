@@ -286,6 +286,7 @@
 
   <!-- Donja traka -->
   <nav class="tabbar" aria-label="Navigacija">
+    <button class="tab-naziv" type="button" data-go="pocetna" id="tabNaziv"></button>
     <button class="tab" type="button" data-go="pocetna"><svg class="ik"><use href="#i-home"/></svg><span data-i18n="tab_pocetna">Početna</span></button>
     <button class="tab" type="button" data-go="usluge"><svg class="ik"><use href="#i-list"/></svg><span data-i18n="tab_usluge">Usluge</span></button>
     <button class="tab" type="button" data-go="termini"><svg class="ik"><use href="#i-cal"/></svg><span data-i18n="tab_termini">Termini</span></button>
@@ -594,6 +595,7 @@
     function podaciSalona() {
       if (SALON.logo) { $('logo').src = SALON.logo; $('logo').alt = SALON.naziv; $('logo').hidden = false; $('nazivLogo').hidden = true; }
       $('nazivLogo').textContent = SALON.naziv;
+      $('tabNaziv').textContent = SALON.naziv; // naziv u gornjoj traci na računalu
       $('telefon').textContent = SALON.telefon;
       $('telefon').href = 'tel:' + SALON.telefon.replace(/[^\d+]/g, '').replace(/^00/, '+').replace(/^0/, '+385');
       $('adresa').textContent = SALON.adresa;
