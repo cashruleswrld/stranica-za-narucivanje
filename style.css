@@ -288,3 +288,22 @@ footer {
 .cip { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: .9rem; color: var(--ink); }
 .cip.losa { border-color: var(--greska); color: var(--greska); }
 .termin.propusten { border-left-color: var(--greska); }
+
+/* Admin: postavke salona */
+.post-naslov { margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 1.2rem; }
+.post-opis { margin-top: -12px; font-size: .9rem; }
+.post-lista { display: grid; gap: 8px; }
+.post-usluga { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 70px 40px; gap: 6px; align-items: center; }
+.post-dan { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto 96px; gap: 8px; align-items: center; }
+.post-dan .kvacica { color: var(--ink); }
+.post-dan select:disabled { opacity: .35; }
+.post-neradni { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 6px 6px 12px; }
+#postavke .kal-strelica { width: 36px; height: 36px; font-size: 1.2rem; }
+@media (max-width: 520px) {
+  .post-usluga { grid-template-columns: minmax(0, 1fr) 70px 36px; }
+  .post-usluga .u-en { grid-column: 1 / 2; grid-row: 2; font-size: .9rem; height: 38px; }
+  .post-usluga { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .post-dan { grid-template-columns: minmax(0, 1fr) 84px auto 84px; gap: 4px; }
+  .post-dan select { padding: 8px 4px; }
+}
+.post-dan .prazno { margin: 0; }

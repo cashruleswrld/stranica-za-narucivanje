@@ -16,7 +16,7 @@
 
   <header class="top">
     <span class="logo"><img class="logo-img" src="icon-192.png" alt=""><span id="naziv"></span></span>
-    <nav><a href="#" id="odjava" hidden>Odjava</a></nav>
+    <nav><a href="#" id="otvoriPostavke" hidden>Postavke salona</a><a href="upute.html" target="_blank">Upute</a><a href="#" id="odjava" hidden>Odjava</a></nav>
   </header>
 
   <main>
@@ -71,6 +71,57 @@
       </form>
     </dialog>
 
+    <!-- Postavke salona: vlasnik sam mijenja podatke, usluge, radno vrijeme i neradne dane (spremaju se u bazu) -->
+    <dialog id="postavke" class="prozor">
+      <div class="prozor-glava">
+        <div><h2>Postavke salona</h2><span class="prazno">Promjene vide klijenti čim spremiš.</span></div>
+        <button class="kal-strelica" type="button" id="sZatvori" aria-label="Zatvori">×</button>
+      </div>
+      <form id="sForma" novalidate>
+        <h3 class="post-naslov">Podaci salona</h3>
+        <label>Naziv salona
+          <input type="text" name="naziv" required maxlength="40">
+        </label>
+        <div class="red">
+          <label>Telefon
+            <input type="tel" name="telefon" required maxlength="30">
+          </label>
+          <label>Instagram (bez @, neobavezno)
+            <input type="text" name="instagram" maxlength="40" autocapitalize="off">
+          </label>
+        </div>
+        <label>Adresa
+          <input type="text" name="adresa" required maxlength="80">
+        </label>
+
+        <h3 class="post-naslov">Usluge i cijene</h3>
+        <p class="prazno post-opis">Cijena u cijelim eurima. Već zakazani termini zadržavaju staru cijenu.</p>
+        <div id="sUsluge" class="post-lista"></div>
+        <button class="btn-otkazi sivo" type="button" id="sDodajUslugu">+ Dodaj uslugu</button>
+
+        <h3 class="post-naslov">Radno vrijeme</h3>
+        <p class="prazno post-opis">Odznači dan kad salon ne radi.</p>
+        <div id="sRadno" class="post-lista"></div>
+
+        <h3 class="post-naslov">Neradni dani (godišnji, bolovanje…)</h3>
+        <p class="prazno post-opis">Tih dana klijenti se ne mogu naručiti. Već zakazane termine otkaži sam.</p>
+        <div id="sNeradni" class="post-lista"></div>
+        <div class="red">
+          <label>Od
+            <input type="date" id="sOd">
+          </label>
+          <label>Do (za jedan dan ostavi prazno)
+            <input type="date" id="sDo">
+          </label>
+        </div>
+        <button class="btn-otkazi sivo" type="button" id="sDodajNeradni">+ Dodaj neradne dane</button>
+        <label class="kvacica"><input type="checkbox" name="blagdani"> Zatvoreno na državne blagdane</label>
+
+        <button class="btn" type="submit">Spremi postavke</button>
+        <p class="greska" id="sGreska" role="alert"></p>
+      </form>
+    </dialog>
+
     <!-- Povijest jednog klijenta (otvara se klikom na termin) -->
     <dialog id="povijest" class="prozor">
       <div class="prozor-glava">
@@ -83,7 +134,7 @@
   </main>
 
   <script type="module">
-    import { Store, Auth, cijena, provjeriTel, satiZaDan, radiDan, blagdan, vrijednostUsluge } from './app.js';
+    import { Store, Auth, Postavke, cijena, provjeriTel, satiZaDan, radiDan, blagdan, vrijednostUsluge, DANI } from './app.js';
     import { SALON } from './postavke.js';
     import { kalendar, ymd } from './kalendar.js';
     const $ = id => document.getElementById(id);
@@ -93,8 +144,8 @@
     const lijepDan = (d, o = { weekday: 'long', day: 'numeric', month: 'long' }) => new Date(d + 'T00:00').toLocaleDateString('hr-HR', o);
     const kratkiDan = d => lijepDan(d, { day: 'numeric', month: 'numeric', year: 'numeric' });
     const sad = () => ymd(new Date()) + 'T' + new Date().toTimeString().slice(0, 5);
-    $('naziv').textContent = SALON.naziv;
-    document.title = SALON.naziv + ' – termini';
+    const nazivSalona = () => { $('naziv').textContent = SALON.naziv; document.title = SALON.naziv + ' – termini'; };
+    nazivSalona();
     const el = (tag, cls, tekst) => { const e = document.createElement(tag); if (cls) e.className = cls; if (tekst != null) e.textContent = tekst; return e; };
 
     $('prijavaForma').addEventListener('submit', async (e) => {
@@ -122,6 +173,7 @@
       $('prijava').hidden = !!user;
       $('panel').hidden = !user;
       odjava.hidden = !user;
+      $('otvoriPostavke').hidden = !user;
       if (user) { kal.postavi(kal.odabrani() || ymd(new Date())); osvjezi(); }
     });
     // Kad se aplikacija ponovno otvori, povuci nove termine
@@ -249,7 +301,11 @@
 
     // ----- Ručni upis termina za odabrani dan -----
     const rForma = $('rForma');
-    SALON.usluge.forEach(u => rForma.usluga.append(new Option(`${u.hr} – ${u.cijena} €`, vrijednostUsluge(u))));
+    const popuniUsluge = () => {
+      rForma.usluga.innerHTML = '';
+      SALON.usluge.forEach(u => rForma.usluga.append(new Option(`${u.hr} – ${u.cijena} €`, vrijednostUsluge(u))));
+    };
+    popuniUsluge();
     $('dodajTermin').onclick = () => {
       const d = kal.odabrani();
       rForma.reset(); rForma.vrijeme.value = ''; $('rGreska').textContent = '';
@@ -284,6 +340,127 @@
       gumb.disabled = false;
     });
     $('rZatvori').onclick = () => $('rucno').close();
+
+    // ----- Postavke salona -----
+    const sForma = $('sForma');
+    const DANI_RED = ['pon', 'uto', 'sri', 'cet', 'pet', 'sub', 'ned'];
+    const imeDana = k => { const s = new Date(2024, 0, 7 + DANI.indexOf(k)).toLocaleDateString('hr-HR', { weekday: 'long' }); return s[0].toUpperCase() + s.slice(1); };
+    let neradni = [];
+    // Vremena za radno vrijeme (svakih 15 min, 24-satni prikaz na svim mobitelima)
+    const VREMENA = Array.from({ length: 96 }, (_, i) => String(Math.floor(i / 4)).padStart(2, '0') + ':' + String(i % 4 * 15).padStart(2, '0'));
+
+    function redUsluge(u = { hr: '', en: '', cijena: '' }) {
+      const r = el('div', 'post-usluga');
+      r.innerHTML = '<input type="text" class="u-hr" maxlength="45" placeholder="Naziv usluge"><input type="text" class="u-en" maxlength="45" placeholder="Na engleskom (neobavezno)"><input type="number" class="u-cijena" min="0" max="9999" step="1" inputmode="numeric" placeholder="€"><button class="kal-strelica" type="button" aria-label="Obriši uslugu">×</button>';
+      r.querySelector('.u-hr').value = u.hr; r.querySelector('.u-en').value = u.en || ''; r.querySelector('.u-cijena').value = u.cijena;
+      r.querySelector('button').onclick = () => r.remove();
+      $('sUsluge').append(r);
+      return r;
+    }
+    function crtajRadno() {
+      $('sRadno').innerHTML = '';
+      DANI_RED.forEach(k => {
+        const v = SALON.radnoVrijeme[k], r = el('div', 'post-dan');
+        r.dataset.dan = k;
+        r.innerHTML = '<label class="kvacica"><input type="checkbox" class="d-radi"> <span></span></label><select class="d-od"></select><span class="prazno">–</span><select class="d-do"></select>';
+        r.querySelector('span').textContent = imeDana(k);
+        const radi = r.querySelector('.d-radi'), od = r.querySelector('.d-od'), doo = r.querySelector('.d-do');
+        [od, doo].forEach((s, i) => {
+          const sada = v ? v[i] : ['09:00', '17:00'][i];
+          const sati = [...new Set([...VREMENA, sada])].sort();
+          sati.forEach(x => s.append(new Option(x, x)));
+          s.value = sada;
+        });
+        radi.checked = !!v;
+        const osvjezi = () => { od.disabled = doo.disabled = !radi.checked; };
+        radi.onchange = osvjezi; osvjezi();
+        $('sRadno').append(r);
+      });
+    }
+    // Uzastopni neradni dani prikazuju se kao jedan red, npr. "1. 8. 2026. – 15. 8. 2026."
+    function crtajNeradne() {
+      $('sNeradni').innerHTML = '';
+      const sljedeci = d => { const x = new Date(d + 'T00:00'); x.setDate(x.getDate() + 1); return ymd(x); };
+      const dani = [...new Set(neradni)].sort();
+      if (!dani.length) $('sNeradni').append(el('p', 'prazno', 'Nema upisanih neradnih dana.'));
+      for (let i = 0; i < dani.length;) {
+        let j = i; while (j + 1 < dani.length && dani[j + 1] === sljedeci(dani[j])) j++;
+        const grupa = dani.slice(i, j + 1), r = el('div', 'post-neradni');
+        r.append(el('span', null, i === j ? kratkiDan(dani[i]) : `${kratkiDan(dani[i])} – ${kratkiDan(dani[j])} (${grupa.length} dana)`));
+        const b = el('button', 'kal-strelica', '×'); b.type = 'button'; b.setAttribute('aria-label', 'Obriši');
+        b.onclick = () => { neradni = neradni.filter(d => !grupa.includes(d)); crtajNeradne(); };
+        r.append(b);
+        $('sNeradni').append(r);
+        i = j + 1;
+      }
+    }
+    $('sDodajNeradni').onclick = () => {
+      const g = $('sGreska'); g.textContent = '';
+      const od = $('sOd').value, doo = $('sDo').value || od;
+      if (!od) { g.textContent = 'Odaberi datum "Od".'; return; }
+      if (doo < od) { g.textContent = 'Datum "Do" je prije datuma "Od".'; return; }
+      const x = new Date(od + 'T00:00'), novi = [];
+      while (ymd(x) <= doo && novi.length < 366) { novi.push(ymd(x)); x.setDate(x.getDate() + 1); }
+      neradni = [...new Set([...neradni, ...novi])];
+      $('sOd').value = $('sDo').value = '';
+      crtajNeradne();
+    };
+    $('sDodajUslugu').onclick = () => redUsluge().querySelector('.u-hr').focus();
+
+    $('otvoriPostavke').onclick = e => {
+      e.preventDefault();
+      sForma.naziv.value = SALON.naziv; sForma.telefon.value = SALON.telefon;
+      sForma.adresa.value = SALON.adresa; sForma.instagram.value = SALON.instagram || '';
+      sForma.blagdani.checked = !!SALON.blagdani;
+      $('sUsluge').innerHTML = ''; SALON.usluge.forEach(u => redUsluge(u));
+      crtajRadno();
+      neradni = (SALON.neradniDani || []).slice(); crtajNeradne();
+      $('sGreska').textContent = '';
+      $('postavke').showModal();
+    };
+    sForma.addEventListener('submit', async e => {
+      e.preventDefault();
+      const g = $('sGreska'); g.textContent = '';
+      const greska = tekst => { g.textContent = tekst; };
+      const naziv = sForma.naziv.value.trim(), telefon = sForma.telefon.value.trim(), adresa = sForma.adresa.value.trim();
+      const instagram = sForma.instagram.value.trim().replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/.*$/, '');
+      if (!naziv) return greska('Upiši naziv salona.');
+      if (!telefon) return greska('Upiši telefon salona.');
+      if (!adresa) return greska('Upiši adresu salona.');
+      const usluge = [];
+      for (const r of $('sUsluge').children) {
+        const hr = r.querySelector('.u-hr').value.trim(), en = r.querySelector('.u-en').value.trim(), c = r.querySelector('.u-cijena').value.trim();
+        if (!hr && !en && !c) continue; // prazan red se preskače
+        if (!hr) return greska('Svaka usluga mora imati naziv.');
+        if (/[()]/.test(hr + en)) return greska(`Naziv usluge ne smije imati zagrade: ${hr}`);
+        if (!/^\d{1,4}$/.test(c)) return greska(`Upiši cijenu u cijelim eurima (npr. 25) za: ${hr}`);
+        if (usluge.some(u => u.hr.toLowerCase() === hr.toLowerCase())) return greska(`Usluga "${hr}" je upisana dvaput.`);
+        usluge.push({ hr, en, cijena: +c });
+      }
+      if (!usluge.length) return greska('Upiši barem jednu uslugu.');
+      const radnoVrijeme = {};
+      for (const r of $('sRadno').children) {
+        const k = r.dataset.dan, od = r.querySelector('.d-od').value, doo = r.querySelector('.d-do').value;
+        if (!r.querySelector('.d-radi').checked) { radnoVrijeme[k] = null; continue; }
+        if (!od || !doo || doo <= od) return greska(`${imeDana(k)}: vrijeme zatvaranja mora biti nakon otvaranja.`);
+        radnoVrijeme[k] = [od, doo];
+      }
+      if (!Object.values(radnoVrijeme).some(Boolean)) return greska('Salon mora raditi barem jedan dan u tjednu.');
+      const danas = ymd(new Date());
+      const neradniDani = [...new Set(neradni)].filter(d => d >= danas).sort(); // prošli dani se brišu sami
+      const gumb = sForma.querySelector('button[type=submit]'); gumb.disabled = true; gumb.textContent = 'Spremam…';
+      try {
+        await Postavke.spremi({ naziv, telefon, adresa, instagram, radnoVrijeme, blagdani: sForma.blagdani.checked, neradniDani, usluge });
+        $('postavke').close();
+        nazivSalona(); popuniUsluge();
+        kal.crtaj(); prikaziDan(kal.odabrani());
+        alert('Postavke su spremljene.');
+      } catch (er) {
+        greska('Spremanje nije uspjelo (u Firebaseu možda nisu zalijepljena nova pravila – Firestore Database → Rules). Greška: ' + (er.code || er.message));
+      }
+      gumb.disabled = false; gumb.textContent = 'Spremi postavke';
+    });
+    $('sZatvori').onclick = () => $('postavke').close();
     $('povijest').addEventListener('click', e => { if (e.target === $('povijest')) $('povijest').close(); });
   </script>
 </body>

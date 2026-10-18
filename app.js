@@ -11,6 +11,33 @@ const app = initializeApp(FIREBASE);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Postavke koje vlasnik mijenja sam u admin.html ("Postavke salona") spremaju se u bazu (postavke/salon)
+// i prepisuju zadane vrijednosti iz postavke.js. Zadnje učitane pamte se u pregledniku za slučaj da nema interneta.
+const UREDIVO = ['naziv', 'telefon', 'adresa', 'instagram', 'radnoVrijeme', 'blagdani', 'neradniDani', 'usluge'];
+const ZADANO = JSON.parse(JSON.stringify(Object.fromEntries(UREDIVO.map(k => [k, SALON[k]]))));
+const KLJUC = 'postavkeSalona_' + FIREBASE.projectId;
+function primijeniPostavke(p) {
+  UREDIVO.forEach(k => { SALON[k] = p && p[k] !== undefined ? p[k] : JSON.parse(JSON.stringify(ZADANO[k])); });
+}
+try { primijeniPostavke(JSON.parse(localStorage.getItem(KLJUC))); } catch {}
+try {
+  const d = await Promise.race([getDoc(doc(db, 'postavke', 'salon')), new Promise((_, ne) => setTimeout(ne, 4000))]);
+  const p = d.exists() ? d.data() : null;
+  primijeniPostavke(p);
+  try { localStorage.setItem(KLJUC, JSON.stringify(p)); } catch {}
+} catch {}
+
+export const Postavke = {
+  zadano: () => JSON.parse(JSON.stringify(ZADANO)),
+  // Samo vlasnik salona (pravila baze); nakon spremanja odmah vrijedi i na ovom uređaju
+  async spremi(p) {
+    const podaci = Object.fromEntries(UREDIVO.map(k => [k, p[k]]));
+    await setDoc(doc(db, 'postavke', 'salon'), podaci);
+    primijeniPostavke(podaci);
+    try { localStorage.setItem(KLJUC, JSON.stringify(podaci)); } catch {}
+  }
+};
+
 // "slots" = javno vidljivi zauzeti sati (bez imena), "termini" = pravi podaci (vidi ih samo vlasnik salona i klijent),
 // "dnevno" = oznaka {uid}_{datum} koja sprječava da jedna osoba ima više od jednog termina u danu (ako je SALON.jedanTerminDnevno)
 const dnevnoId = (uid, datum) => `${uid}_${datum}`;
@@ -165,7 +192,10 @@ export const Auth = {
     await deleteDoc(doc(db, 'korisnici', u.uid));
     await deleteUser(u);
   },
-  reset: (email) => sendPasswordResetEmail(auth, email),
+  reset: (email) => {
+    try { auth.languageCode = localStorage.getItem('jezik') || 'hr'; } catch { auth.languageCode = 'hr'; } // email na jeziku aplikacije
+    return sendPasswordResetEmail(auth, email);
+  },
   logout: () => signOut(auth),
   onChange: cb => onAuthStateChanged(auth, cb)
 };

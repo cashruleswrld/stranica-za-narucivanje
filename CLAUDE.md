@@ -10,6 +10,9 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - **Sve što je specifično za jedan salon je u `postavke.js`**: naziv, logo, telefon, adresa, Instagram, email vlasnika,
   radno vrijeme po danima, trajanje termina, blagdani (hrvatski, uklj. Uskrsni ponedjeljak i Tijelovo) i dodatni neradni dani, usluge (hr/en naziv + cijena), dana unaprijed, max budućih termina, rok otkaza, Firebase config.
   Kod ne smije imati podatke konkretnog salona; novo podešavanje dodaj u `postavke.js`.
+- **Postavke salona u adminu**: vlasnik salona sam mijenja naziv, telefon, adresu, Instagram, usluge/cijene, radno vrijeme, neradne dane i blagdane.
+  Spremaju se u bazu (`postavke/salon`) i pri pokretanju (`app.js`, top-level await, max 4 s, zadnje pamti u localStorage) prepisuju te vrijednosti u `SALON`.
+  Vrijednosti u `postavke.js` su samo početne (dok vlasnik ništa ne spremi). Trajanje termina, rok otkaza, email i Firebase ostaju samo u `postavke.js`.
 - Za novog klijenta mijenja se još: email u `firestore.rules`, naziv u `manifest.json` / `manifest-admin.json`, po želji ikone `icon-192.png` / `icon-512.png` / `apple-touch-icon.png` (180 px, za iPhone) i logo.
 - Usluga se uz termin sprema kao "Naziv (20 €)" pa stari termini pamte staru cijenu.
 - Tekstovi su rodno neutralni (klijenti mogu biti i muški i ženski).
@@ -17,13 +20,14 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 ## Fajlovi
 - `postavke.js` – `SALON`, `IZRADA` (kontakt izrađivača na stranici "O aplikaciji"), `FIREBASE`.
 - `index.html` – klijentska aplikacija, hash rute (#pocetna #usluge #termini #postavke, podstranice #prijava #registracija #rezervacija #profil #racun #oaplikaciji #obrisi #privatnost). Registracija traži kvačicu za pravila privatnosti (tekst u `jezik.js`, ključevi `pv_h*`/`pv_t*`). Cjenik, izbornik usluga, radno vrijeme i podaci salona pune se iz `postavke.js`.
-- `admin.html` – vlasnik salona: kalendar (učitava samo prikazani mjesec), termini dana, povijest klijenta u `<dialog>`, gumbi Otkaži / Nije došao/la / Plaćeno / Ipak je došao/la / Oprosti. „+ Upiši termin” = vlasnik sam upisuje termin (bez računa klijenta, `rucno: true`, mobitel neobavezan; može i na blagdan). Odjavljuje svakoga tko nije `emailVlasnika`.
-- `app.js` – Firebase (SDK 10.12.2 s gstatic CDN-a). Izvozi `Store`, `Profil`, `Auth`, `provjeriTel`, `cijena`, `satiDo`, `ROK_OTKAZA`, `vrijednostUsluge`, `nadjiUslugu`, `satiZaDan`, `radiDan`, `blagdan`, `DANI`.
+- `upute.html` – upute za vlasnika salona (link „Upute” u adminu); ažuriraj ih kad mijenjaš admin.
+- `admin.html` – vlasnik salona: „Postavke salona” (prozor), kalendar (učitava samo prikazani mjesec), termini dana, povijest klijenta u `<dialog>`, gumbi Otkaži / Nije došao/la / Plaćeno / Ipak je došao/la / Oprosti. „+ Upiši termin” = vlasnik sam upisuje termin (bez računa klijenta, `rucno: true`, mobitel neobavezan; može i na blagdan). Odjavljuje svakoga tko nije `emailVlasnika`.
+- `app.js` – Firebase (SDK 10.12.2 s gstatic CDN-a). Izvozi `Store`, `Profil`, `Auth`, `Postavke`, `provjeriTel`, `cijena`, `satiDo`, `ROK_OTKAZA`, `vrijednostUsluge`, `nadjiUslugu`, `satiZaDan`, `radiDan`, `blagdan`, `DANI`.
 - `kalendar.js` – zajednički kalendar (`kalendar(el, {loc, odabir, onemoguci, oznaka, od, do, naMjesec})`, `ymd`).
-- `jezik.js` – prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
+- `jezik.js` – uvozi `app.js` (da postavke iz baze budu učitane prije prijevoda). Prijevodi hr/en, `data-i18n`, `t()`. `{naziv}` i `{h}` se popunjavaju iz postavki. Svaki novi tekst dodaj u **oba** jezika.
 - `style.css` – crna tema (pozadina #0b0b0c s blagim sivim sjajem na vrhu, kartice #161618), naglasak bijeli (`--naglasak`), greške jantarne (`--greska`), crvena samo za brisanje računa i kasni otkaz (`--crvena`).
 - `firestore.rules` – pravila baze (email vlasnika u funkciji `vlasnik()`, rok otkaza 8 h). **Ne primjenjuju se sama**: lijepe se u Firebase konzolu.
-- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v6`); novi JS fajl dodaj u `FILES`.
+- `sw.js` – service worker. **Pri svakoj izmjeni povećaj `CACHE`** (trenutno `salon-v7`); novi JS fajl dodaj u `FILES`.
 - `racun.html` – samo preusmjerenje.
 
 ## Baza (Firestore, Spark besplatni plan; Auth samo email+lozinka; svaki salon ima SVOJ Firebase projekt)
@@ -32,6 +36,7 @@ Nastala je iz aplikacije za "Edi Barbershop" (zaseban repozitorij `edi-barber`, 
 - Ručno upisan termin: {ime, tel ('' ili broj), usluga, datum, vrijeme, napomena, created, rucno: true} – bez `uid`.
 - `termini/{datum_vrijeme}_k` – kasno otkazan termin: kopija + {otkazanKasno, nijeDosao: true, podmireno: false}.
 - `dnevno/{uid}_{datum}` – najviše 1 termin u danu po osobi; piše se samo ako je `jedanTerminDnevno: true` (trenutno isključeno, kao i `maxBuducih: 0`).
+- `postavke/salon` – {naziv, telefon, adresa, instagram, radnoVrijeme, blagdani, neradniDani, usluge}; čita svatko, piše samo vlasnik.
 - `korisnici/{uid}` – {ime, tel}. Promjena u profilu upisuje novo ime/mobitel i u buduće termine te osobe (pravila to dopuštaju samo za `ime` i `tel`).
 - Naručivanje je batch (slot + dnevno + termin). Neplaćen nedolazak / kasni otkaz = dug.
 - Paziti na limit od 50.000 čitanja dnevno: ne učitavati cijelu kolekciju `termini`.
