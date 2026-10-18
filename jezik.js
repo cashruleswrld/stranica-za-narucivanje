@@ -1,6 +1,7 @@
 // Prijevodi (hr / en) i prebacivanje jezika. Odabrani jezik pamti se u pregledniku.
 // {naziv} i {h} se u svim tekstovima popunjavaju iz postavke.js
 import { SALON } from './postavke.js';
+import './app.js'; // prvo se učitaju postavke salona iz baze (naziv, adresa…)
 
 const R = {
   hr: {

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upute za salon</title>
+  <meta name="theme-color" content="#0b0b0c">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .upute { max-width: 760px; margin: 0 auto; padding: 36px 6vw 60px; }
+    .upute h1 { font-size: 2.2rem; margin-bottom: 6px; }
+    .upute h2 { margin: 34px 0 10px; font-size: 1.35rem; }
+    .upute p, .upute li { color: var(--ink); }
+    .upute ol, .upute ul { padding-left: 22px; display: grid; gap: 6px; }
+    .upute b { font-weight: 500; color: #fff; }
+    .upute .okvir { background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--naglasak); border-radius: 4px; padding: 14px 18px; margin: 14px 0; }
+    .upute table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .upute td { border-top: 1px solid var(--line); padding: 8px 10px 8px 0; vertical-align: top; }
+    .upute td:first-child { white-space: nowrap; font-weight: 500; }
+    @media print { body { background: #fff; color: #000; } .upute p, .upute li, .upute b, .upute td { color: #000; } .top { display: none; } .upute .okvir { background: #fff; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <span class="logo"><img class="logo-img" src="icon-192.png" alt=""><span id="naziv"></span></span>
+    <nav><a href="admin.html">← Natrag na termine</a></nav>
+  </header>
+
+  <main class="upute">
+    <h1>Upute za salon</h1>
+    <p class="prazno">Kako koristiti aplikaciju za naručivanje (dio za vlasnika salona).</p>
+
+    <h2>1. Prijava i aplikacija na mobitelu</h2>
+    <ol>
+      <li>Otvori stranicu <b id="adminLink">…/admin.html</b> i prijavi se svojim emailom i lozinkom.</li>
+      <li>Da je imaš kao aplikaciju: na iPhoneu u Safariju <b>Podijeli → Dodaj na početni zaslon</b>, na Androidu u Chromeu <b>⋮ → Dodaj na početni zaslon</b> (ili <b>Instaliraj aplikaciju</b>).</li>
+      <li>Zaboravljena lozinka: na stranici za klijente klikni <b>Prijava → Zaboravljena lozinka</b> i upiši svoj email. Stići će ti email s poveznicom za novu lozinku.</li>
+    </ol>
+
+    <h2>2. Termini</h2>
+    <ul>
+      <li>U kalendaru broj na danu znači koliko je termina taj dan. Klikni dan da vidiš termine.</li>
+      <li>Klik na ime klijenta otvara <b>povijest</b>: koliko je puta došao/la, nedolasci, kasni otkazi i dug.</li>
+      <li>Klik na broj mobitela odmah zove klijenta.</li>
+      <li><b>+ Upiši termin</b> – kad te netko nazove ili dođe bez narudžbe. Upišeš ime, uslugu i vrijeme (mobitel nije obavezan). Taj sat se odmah zauzme i klijenti ga više ne vide.</li>
+    </ul>
+
+    <h2>3. Gumbi kod termina</h2>
+    <table>
+      <tr><td>Otkaži termin</td><td>Briše budući termin i oslobađa sat. Javi klijentu sam (poziv/poruka) – aplikacija ne šalje obavijesti.</td></tr>
+      <tr><td>Nije došao/la</td><td>Za prošli termin na koji klijent nije došao. Klijent tada duguje cijenu tog termina i to vidi kad se idući put naručuje.</td></tr>
+      <tr><td>Plaćeno</td><td>Klijent je platio propušteni termin – dug nestaje.</td></tr>
+      <tr><td>Ipak je došao/la</td><td>Ako si greškom kliknuo/la „Nije došao/la”.</td></tr>
+      <tr><td>Oprosti</td><td>Za kasni otkaz koji ne želiš naplatiti.</td></tr>
+    </table>
+    <div class="okvir">
+      <b>Kasni otkaz:</b> ako klijent otkaže manje od <span id="rok">8</span> sati prije termina, sat se oslobodi, ali termin ostaje zapisan kao dug („Kasno otkazano”).
+      Dok dug nije plaćen ili oprošten, klijent ne može obrisati svoj račun.
+    </div>
+
+    <h2>4. Postavke salona</h2>
+    <p>Gore desno klikni <b>Postavke salona</b>. Sve promjene vrijede čim klikneš <b>Spremi postavke</b>.</p>
+    <ul>
+      <li><b>Podaci salona</b> – naziv, telefon, adresa (za kartu), Instagram.</li>
+      <li><b>Usluge i cijene</b> – promijeni naziv ili cijenu, <b>+ Dodaj uslugu</b> za novu, <b>×</b> za brisanje. Cijena u cijelim eurima. Naziv na engleskom nije obavezan (vide ga klijenti koji su odabrali engleski). Već zakazani termini zadržavaju staru cijenu.</li>
+      <li><b>Radno vrijeme</b> – za svaki dan od kada do kada radiš. Odznači dan kad ne radiš. Zadnji termin u danu je onaj koji završava do zatvaranja.</li>
+      <li><b>Neradni dani</b> – godišnji odmor, bolovanje, slobodan dan: odaberi <b>Od</b> i <b>Do</b> pa <b>+ Dodaj neradne dane</b>. Tih dana nitko se ne može naručiti. Prošli datumi se sami brišu.</li>
+      <li><b>Zatvoreno na državne blagdane</b> – ako je uključeno, na blagdane (i Uskrsni ponedjeljak, Tijelovo) nitko se ne može naručiti.</li>
+    </ul>
+    <div class="okvir">
+      Ako zatvoriš dan na koji već ima termina, oni <b>ostaju</b> – otkaži ih sam i javi klijentima.
+      Ti i dalje možeš ručno upisati termin i na neradni dan ili blagdan.
+    </div>
+
+    <h2>5. Klijenti</h2>
+    <ul>
+      <li>Klijenti se naručuju na <b id="klijentLink">…</b> – podijeli tu poveznicu na Instagramu, WhatsAppu, Google Mapsu.</li>
+      <li>Za naručivanje trebaju račun (email + lozinka). Ime i mobitel sami upišu i mogu ih promijeniti u Postavkama.</li>
+      <li>Klijent sam može otkazati termin u aplikaciji (Termini → Otkaži).</li>
+      <li>Ako klijent želi obrisati svoje podatke, to radi sam: Postavke → Obriši račun.</li>
+    </ul>
+
+    <h2>6. Firebase (baza podataka)</h2>
+    <ul>
+      <li>Podaci se spremaju u Google Firebase na tvom Google računu (besplatni plan). Ne treba ništa plaćati ni održavati.</li>
+      <li>Lozinku za admin promijeni preko „Zaboravljena lozinka” (vidi gore).</li>
+      <li>Ne mijenjaj ništa u <b>Firestore Database → Rules</b> osim ako znaš što radiš – ta pravila čuvaju podatke klijenata.</li>
+      <li>Ti si odgovoran/na za podatke klijenata (GDPR). Pravila privatnosti vide se u aplikaciji pod Postavke → Pravila privatnosti.</li>
+    </ul>
+
+    <p class="prazno" style="margin-top:40px">Savjet: ovu stranicu možeš isprintati ili spremiti kao PDF (Ctrl + P).</p>
+  </main>
+
+  <script type="module">
+    import './app.js'; // naziv salona iz Postavki salona
+    import { SALON } from './postavke.js';
+    const $ = id => document.getElementById(id);
+    $('naziv').textContent = SALON.naziv;
+    document.title = 'Upute – ' + SALON.naziv;
+    $('rok').textContent = SALON.rokOtkaza;
+    const baza = location.href.replace(/[^/]*([?#].*)?$/, '');
+    $('adminLink').textContent = baza + 'admin.html';
+    $('klijentLink').textContent = baza;
+  </script>
+</body>
+</html>

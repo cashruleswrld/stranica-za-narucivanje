@@ -91,6 +91,21 @@ service cloud.firestore {
                 || existsAfter(put('termini', id + '_k'))));
     }
 
+    // Postavke salona (usluge, cijene, radno vrijeme, neradni dani, kontakt) – čita svatko, mijenja samo vlasnik salona
+    match /postavke/{id} {
+      allow read: if true;
+      allow write: if vlasnik() && id == 'salon'
+        && request.resource.data.keys().hasOnly(['naziv', 'telefon', 'adresa', 'instagram', 'radnoVrijeme', 'blagdani', 'neradniDani', 'usluge'])
+        && request.resource.data.naziv is string && request.resource.data.naziv.size() <= 40
+        && request.resource.data.telefon is string && request.resource.data.telefon.size() <= 30
+        && request.resource.data.adresa is string && request.resource.data.adresa.size() <= 80
+        && request.resource.data.instagram is string && request.resource.data.instagram.size() <= 40
+        && request.resource.data.radnoVrijeme is map
+        && request.resource.data.blagdani is bool
+        && request.resource.data.neradniDani is list && request.resource.data.neradniDani.size() <= 400
+        && request.resource.data.usluge is list && request.resource.data.usluge.size() <= 60;
+    }
+
     // Osobni podaci klijenta – samo vlasnik
     match /korisnici/{uid} {
       allow read, delete: if prijavljen() && request.auth.uid == uid;
